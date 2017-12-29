@@ -10,6 +10,7 @@
 #include "Stock.h"
 #include "Investor.h"
 #include "Fund.h"
+#include <ctime>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -54,27 +55,78 @@ DataIO::~DataIO() {
 void DataIO::initializeStocksLocal() {
 	cout << "Initializing Stocks" << endl;
 
-	string line;
-	char delim = ',';
-	vector<string> tokens; //Holds each line in the file
+	string line; //Line in file
+	char delim = ','; //Delimiter in file
+	string item; //Item extracted before delimeter
+	tm date = tm();
+
+	vector<tm> dateInfo;
+	vector<string> stockInfo; //Holds each line in the file
 
 	//Open the input file
 	ifstream input (stockFilename);
 
+	//Gets the first line of headers and makes date objects from them
+	if (input.good()) {
+
+		getline(input, line);
+		stringstream ss(line);
+
+		int i = 0;
+
+		//Separates at the delimiter and inserts into the vector
+		while (getline(ss, line, delim)) {
+			i++;
+			//Does not get the first two places
+			if (i < 3) continue;
+
+			date = tm();
+			stringstream ss(line);
+			//Split at the / to get the date
+			if(getline(ss, line, '/')) {
+				date.tm_mon = stoi(line)- 1;
+			}
+
+			if(getline(ss, line, '/')) {
+				date.tm_mday = stoi(line);
+			}
+
+			if(getline(ss, line, '/')) {
+				date.tm_year = stoi(line);
+			}
+
+			dateInfo.push_back(date);
+
+		}
+	}
 	//Reads and extracts each line of the file to get the stock information
 	while (input.good()) {
+		//Gets the line in file
 		getline(input, line);
-		stringstream ss;
-		ss.str(line);
 
+		stringstream ss(line);
 
-		string item;
-
+		//Separates at the delimiter and inserts into the vector
 		while (getline(ss, item, delim)) {
-			tokens.push_back(item);
+			stockInfo.push_back(item);
 		}
-		cout << line << endl;
+		//Initialize the stock
+
 	}
+
+	cout << "Stocks\n ";
+	for (int i = 0; i < stockInfo.size(); i++) {
+		cout << stockInfo.operator[](i) << " ";
+	}
+	cout << "\nDates\n";
+
+	for (int i = 0; i < dateInfo.size(); i++) {
+		cout << to_string(dateInfo.operator[](i).tm_mon) + "/";
+		cout << to_string(dateInfo.operator[](i).tm_mday) + "/";
+		cout << to_string(dateInfo.operator[](i).tm_year);
+		cout << "" << endl;
+	}
+	cout << "" << endl;
 
 	input.close();
 }
