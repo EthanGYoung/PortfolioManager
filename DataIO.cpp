@@ -10,6 +10,7 @@
 #include "Stock.h"
 #include "Investor.h"
 #include "Fund.h"
+#include "Config.h"
 #include <ctime>
 #include <iostream>
 #include <vector>
@@ -23,7 +24,6 @@ using namespace std;
 
 //param filenames: These are the filenames for the inputs and outputs of the stocks, investors, and funds
 DataIO::DataIO(string stockFile, string investorFile, string fundFile) {
-	fund = Fund();
 	stockFilename = stockFile;
 	investorFilename = investorFile;
 	fundFilename = fundFile;
@@ -34,7 +34,6 @@ DataIO::DataIO(string stockFile, string investorFile, string fundFile) {
 DataIO::~DataIO() {
 
 }
-
 
 /**
  * Initializes all of the stocks from a file and adds to Fund.
@@ -53,52 +52,20 @@ DataIO::~DataIO() {
  *
  */
 void DataIO::initializeStocksLocal() {
-	cout << "Initializing Stocks" << endl;
 
+	cout << "Initializing Stocks\n";
+
+	extern char fileDelimDefault; //Delimiter in file
 	string line; //Line in file
-	char delim = ','; //Delimiter in file
 	string item; //Item extracted before delimeter
-	tm date = tm();
-
-	vector<tm> dateInfo;
-	vector<string> stockInfo; //Holds each line in the file
 
 	//Open the input file
-	ifstream input (stockFilename);
+	input.open(stockFilename);
 
-	//Gets the first line of headers and makes date objects from them
-	if (input.good()) {
+	//Reads in the headers to get the dates
+	vector<tm> dateInfo = getDates(stockFilename, fileDelimDefault);
+	//vector<string> stockInfo; //Holds each line in the file
 
-		getline(input, line);
-		stringstream ss(line);
-
-		int i = 0;
-
-		//Separates at the delimiter and inserts into the vector
-		while (getline(ss, line, delim)) {
-			i++;
-			//Does not get the first two places
-			if (i < 3) continue;
-
-			date = tm();
-			stringstream ss(line);
-			//Split at the / to get the date
-			if(getline(ss, line, '/')) {
-				date.tm_mon = stoi(line)- 1;
-			}
-
-			if(getline(ss, line, '/')) {
-				date.tm_mday = stoi(line);
-			}
-
-			if(getline(ss, line, '/')) {
-				date.tm_year = stoi(line);
-			}
-
-			dateInfo.push_back(date);
-
-		}
-	}
 	//Reads and extracts each line of the file to get the stock information
 	while (input.good()) {
 		//Gets the line in file
@@ -106,27 +73,54 @@ void DataIO::initializeStocksLocal() {
 
 		stringstream ss(line);
 
-		//Separates at the delimiter and inserts into the vector
-		while (getline(ss, item, delim)) {
-			stockInfo.push_back(item);
+		//Gets the name of the stock and create a new instance
+		getline(ss, item, fileDelimDefault);
+		Stock currStock(item);
+
+		//Checks if already added to fund
+		if (!fund.stockExists(currStock)) {
+			fund.addStock(currStock);
+		} else {
+			currStock = fund.getStock(currStock.getName());
 		}
-		//Initialize the stock
+
+
+		//Gets and checks the next field Factor Name
+		getline(ss, item, fileDelimDefault);
+		Factor currFactor(item);
+		cout << item << endl;
+
+		//Adds factor to list
+		currStock.addFactor(currFactor);
+
+		//TODO: Finish the switch and make a method to pass in the dates and loop through the line to add all entries
+		for (int i = 0; i < dateInfo.size(); i++) {
+			//Gets the next price
+			getline(ss, item, fileDelimDefault);
+			currStock.setFactorValue(currFactor.getName(),
+					dateInfo.operator[](i), stof(item));
+		}
 
 	}
 
-	cout << "Stocks\n ";
-	for (int i = 0; i < stockInfo.size(); i++) {
-		cout << stockInfo.operator[](i) << " ";
-	}
-	cout << "\nDates\n";
+	//Initialize the stock
+	//Add stock to fund
 
-	for (int i = 0; i < dateInfo.size(); i++) {
-		cout << to_string(dateInfo.operator[](i).tm_mon) + "/";
-		cout << to_string(dateInfo.operator[](i).tm_mday) + "/";
-		cout << to_string(dateInfo.operator[](i).tm_year);
-		cout << "" << endl;
-	}
-	cout << "" << endl;
+
+	 cout << "Stocks\n ";
+	// for (int i = 0; i < stockInfo.size(); i++) {
+	// cout << stockInfo.operator[](i) << " ";
+	 fund.printStocks(dateInfo.operator[](0));
+
+	 cout << "\nDates\n";
+
+	 for (int i = 0; i < dateInfo.size(); i++) {
+	 cout << to_string(dateInfo.operator[](i).tm_mon) + "/";
+	 cout << to_string(dateInfo.operator[](i).tm_mday) + "/";
+	 cout << to_string(dateInfo.operator[](i).tm_year);
+	 cout << "" << endl;
+	 }
+	 cout << "" << endl;
 
 	input.close();
 }
@@ -168,5 +162,47 @@ void DataIO::exportStocksLocal() { //Needed?
 	cout << "Exporting Stocks" << endl;
 }
 
+vector<tm> DataIO::getDates(string filename, char delim) {
+	tm date = tm();
+	string line;
+	vector<tm> dates;
+	fstream input(filename);
 
+//Gets the first line of headers and makes date objects from them
+	if (input.good()) {
+
+		getline(input, line);
+		stringstream ss(line);
+
+		int i = 0;
+
+		//Separates at the delimiter and inserts into the vector
+		while (getline(ss, line, delim)) {
+			i++;
+			//Does not get the first two places
+			if (i < 3)
+				continue;
+
+			date = tm();
+
+			stringstream ss(line);
+			//Split at the / to get the date
+			if (getline(ss, line, '/')) {
+				date.tm_mon = stoi(line) - 1;
+			}
+
+			if (getline(ss, line, '/')) {
+				date.tm_mday = stoi(line);
+			}
+
+			if (getline(ss, line, '/')) {
+				date.tm_year = stoi(line);
+			}
+
+			dates.push_back(date);
+		}
+	}
+
+	return dates;
+}
 

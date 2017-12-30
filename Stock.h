@@ -9,33 +9,44 @@
 #define STOCK_H_
 #include "Factor.h"
 #include <vector>
+#include <map>
+#include <ctime>
+#include <string>
 
 class Stock {
+
 public:
-	Stock(int Date);
+	Stock();
+	Stock(std::string stockName);
 	virtual ~Stock();
 	bool buy();
 	bool sell();
-	float getPriceClose(int Date);
-	float getPriceOpen(int Date);
-	float getPriceHigh(int Date);
-	float getPriceLow(int Date);
-	int getVolume(int Date);
-	void setPriceClose(int Date, float price);
-	void setPriceOpen(int Date, float price);
-	void setPriceHigh(int Date, float price);
-	void setPriceLow(int Date, float price);
-	void setVolume(int Date, int vol);
-	//string toString();
+	//float getPriceClose(tm Date);
+	//float getPriceOpen(tm Date);
+	//float getPriceHigh(tm Date);
+	//float getPriceLow(tm Date);
+	//int getVolume(tm Date);
+	//void setPriceClose(tm Date, float price);
+	//void setPriceOpen(tm Date, float price);
+	//void setPriceHigh(tm Date, float price);
+	//void setPriceLow(tm Date, float price);
+	//void setVolume(tm Date, int vol);
+	float getFactorValue(std::string factorName, tm Date); //Return -1 if factor doesnt exist
+	void setFactorValue(std::string factorName, tm Date, float value);
+	void addFactor(Factor factor);
+	std::string getName();
 private:
-	int *priceClose;
-	int *priceOpen;
-	int *priceHigh;
-	int *priceLow;
-	int *volume;
-	int *purchaseHistory;
+	int convertDate(tm Date);
+	//std::map<int, float> priceClose;
+	//std::map<int, float> priceOpen;
+	//std::map<int, float> priceHigh;
+	//std::map<int, float> priceLow;
+	//std::map<int, int> volume;
+	//std::map<int, float> purchaseHistory;
+	std::map<std::string, Factor> Factors;
 	int numDays;
-	std::vector<Factor> Factors;
+	std::string name;
+
 
 };
 

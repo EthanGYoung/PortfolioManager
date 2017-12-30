@@ -37,6 +37,8 @@ char newUserMain[] = "Not implemented yet.";
 string stockFilenameDefault = "StockData.csv";
 string investorFilenameDefault = "InvestorData.csv";
 string fundFilenameDefault = "FundData.csv";
+char fileDelimDefault = ',';
+string defaultFundName = "Portfolio";
 
 Config::Config() {
 	// TODO Auto-generated constructor stub

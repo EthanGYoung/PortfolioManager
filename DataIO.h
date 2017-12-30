@@ -11,8 +11,13 @@
 #include "Stock.h"
 #include "Investor.h"
 #include "Fund.h"
+#include "Config.h"
 #include <vector>
 #include <string>
+#include <fstream>
+
+//extern string defaultFundName;
+//Fund inFund;
 
 class DataIO {
 public:
@@ -24,6 +29,7 @@ public:
 	void initializeAllInvestorsLocal();
 	void exportInvestorsLocal();
 	void exportStocksLocal();
+	vector<tm> getDates(string filename, char delim);
 	//Importing the data from computer
 	Fund initializeFundLocal();
 
@@ -31,11 +37,14 @@ public:
 	void exportFundLocal();
 	virtual ~DataIO();
 
+
 private:
 	Fund fund;
 	string stockFilename;
 	string investorFilename;
 	string fundFilename;
+	ifstream input;
+
 
 };
 

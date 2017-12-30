@@ -8,19 +8,25 @@
 #include "Investor.h"
 #include <vector>
 #include <string>
+#include <map>
 
 #ifndef FUND_H_
 #define FUND_H_
 
 
 class Fund {
+
 public:
 	Fund();
 	virtual ~Fund();
+	void addStock(Stock stock);
+	bool stockExists(Stock stock);
+	Stock getStock(std::string stockName);
+	void printStocks(tm Date);
 private:
-	string name;
-	std::vector<Stock> stockList;
-	std::vector<Investor> investorList;
+	std::string name;
+	std::map<std::string, Stock> stockList;
+	std::map<std::string, Investor> investorList;
 };
 
 #endif /* FUND_H_ */
