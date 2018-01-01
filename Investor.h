@@ -5,35 +5,44 @@
  *      Author: ethanyoung
  */
 #include <string>
+#include <map>
+#include "Factor.h"
 
 using namespace std;
+
 #ifndef INVESTOR_H_
 #define INVESTOR_H_
 
+extern int defaultInvestorFactorDate;
+
 class Investor {
 public:
-	Investor(string uw, string pw, int Date, float amount);
+	Investor(string uw, string pw);
 	virtual ~Investor();
 	string getUsername();
 	string getPassword();
-	float getInitInvest();
-	float getInitDate();
-	float getCurrInvest();
-	int getRiskAmount();
+	void addFactor(Factor *factor);
+	float getFactorValue(string factorName);
+	void setFactorValue(string factorName, float value);
+	//float getInitInvest();
+	//float getInitDate();
+	//float getCurrInvest();
+	//int getRiskAmount();
 	void setUsername(string uw);
 	void setPassword(string pw);
-	void setInitDate(int Date);
-	void setCurrInvest(float amount);
-	void setInitInvest(float amount);
-	void setRiskAmount(int amount);
+	//void setInitDate(int Date);
+	//void setCurrInvest(float amount);
+	//void setInitInvest(float amount);
+	//void setRiskAmount(int amount);
 
 private:
 	string username;
 	string password;
-	float initInvest;
-	float initDate;
-	float currInvest;
-	int riskAmount;
+	map<string,Factor> Factors;
+	//float initInvest;
+	//float initDate;
+	//float currInvest;
+	//int riskAmount;
 
 };
 

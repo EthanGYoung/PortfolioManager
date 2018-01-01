@@ -39,6 +39,7 @@ string investorFilenameDefault = "InvestorData.csv";
 string fundFilenameDefault = "FundData.csv";
 char fileDelimDefault = ',';
 string defaultFundName = "Portfolio";
+int defaultInvestorFactorDate = 0;
 
 Config::Config() {
 	// TODO Auto-generated constructor stub

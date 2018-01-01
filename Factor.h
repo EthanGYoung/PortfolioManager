@@ -13,7 +13,7 @@
 class Factor {
 
 public:
-	Factor(std::string factorName);
+	Factor(std::string *factorName);
 	virtual ~Factor();
 	void setValue(int index, float value);
 	float getValue(int index);

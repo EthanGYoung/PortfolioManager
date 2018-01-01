@@ -4,6 +4,7 @@
  *  Created on: Dec 20, 2017
  *      Author: ethanyoung
  */
+#include "Fund.h"
 
 #ifndef STOCKSELECTOR_H_
 #define STOCKSELECTOR_H_
@@ -28,6 +29,7 @@ int developerPrompt();
 int newUserPrompt();
 bool checkLogin(int prompt);
 bool initializeInvestors();
+static Fund fund;
 
 class StockSelector {
 public:

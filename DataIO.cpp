@@ -64,77 +64,120 @@ void DataIO::initializeStocksLocal() {
 
 	//Reads in the headers to get the dates
 	vector<tm> dateInfo = getDates(stockFilename, fileDelimDefault);
-	//vector<string> stockInfo; //Holds each line in the file
 
+	int i = 0;
 	//Reads and extracts each line of the file to get the stock information
 	while (input.good()) {
+		i++;
+
 		//Gets the line in file
 		getline(input, line);
 
 		stringstream ss(line);
 
+		//Eats headers
+		if (i == 1) {
+			continue;
+		}
 		//Gets the name of the stock and create a new instance
 		getline(ss, item, fileDelimDefault);
-		Stock currStock(item);
+		Stock *currStock;
+		Stock st(item);
+		currStock = &st;
 
-		//Checks if already added to fund
-		if (!fund.stockExists(currStock)) {
-			fund.addStock(currStock);
+		//Checks if already added to fund else adds it
+		if (!fund.stockExists(*currStock)) {
+			fund.addStock(*currStock);
 		} else {
-			currStock = fund.getStock(currStock.getName());
+			currStock = fund.getStock(currStock->getName());
 		}
 
-
-		//Gets and checks the next field Factor Name
+		//Gets and checks the next field Factor Name and creates a new factor
 		getline(ss, item, fileDelimDefault);
-		Factor currFactor(item);
-		cout << item << endl;
+		Factor currFactor(&item);
 
 		//Adds factor to list
-		currStock.addFactor(currFactor);
+		currStock->addFactor(currFactor);
 
-		//TODO: Finish the switch and make a method to pass in the dates and loop through the line to add all entries
+		//Sets the value for factor at specified date for stock
 		for (int i = 0; i < dateInfo.size(); i++) {
 			//Gets the next price
 			getline(ss, item, fileDelimDefault);
-			currStock.setFactorValue(currFactor.getName(),
+			currStock->setFactorValue(currFactor.getName(),
 					dateInfo.operator[](i), stof(item));
 		}
 
 	}
 
-	//Initialize the stock
-	//Add stock to fund
-
-
-	 cout << "Stocks\n ";
-	// for (int i = 0; i < stockInfo.size(); i++) {
-	// cout << stockInfo.operator[](i) << " ";
-	 fund.printStocks(dateInfo.operator[](0));
-
-	 cout << "\nDates\n";
-
-	 for (int i = 0; i < dateInfo.size(); i++) {
-	 cout << to_string(dateInfo.operator[](i).tm_mon) + "/";
-	 cout << to_string(dateInfo.operator[](i).tm_mday) + "/";
-	 cout << to_string(dateInfo.operator[](i).tm_year);
-	 cout << "" << endl;
-	 }
-	 cout << "" << endl;
-
 	input.close();
 }
-
-//Initializes a single investor
-//param investor: The investor that someone is logging in as
-//Maybe get rid of and just initialize entire fund every time
-//void DataIO::initializeInvestorLocal(Investor investor) {
-//	cout << "Initializing Investor: " << investor.getUsername() << endl;
-//}
 
 //Initializes all investors
 void DataIO::initializeAllInvestorsLocal() {
 	cout << "Initializing Investors" << endl;
+
+	extern char fileDelimDefault; //Delimiter in file
+	string line; //Line in file
+	string item;
+
+	//Open the input file
+	input.open(investorFilename);
+
+	//Create a vector to hold the factorNamess
+	vector<string> vec;
+	vector<string> *factorNames = &vec;
+	Investor *currInvestor;
+
+	int i = 0;
+	//Reads and extracts each line of the file to get the investor information
+	while (input.good()) {
+		i++;
+
+		//Gets the line in file
+		getline(input, line);
+
+		stringstream ss(line);
+
+
+
+		//Extracts Headers and factor names
+		if (i == 1) {
+			//Parses header and gets the names of the factors
+			while (getline(ss, item, fileDelimDefault)) {
+				if (item == "Username" || item == "Password")
+					continue;
+				factorNames->push_back(item);
+			}
+
+			continue;
+		}
+
+		//Gets the name of the stock and create a new instance
+		getline(ss, item, fileDelimDefault);
+		string username = item;
+		getline(ss, item, fileDelimDefault);
+		string password = item;
+
+		//Creates the investor as a pointer
+		Investor Inv(username, password);
+		currInvestor = &Inv;
+
+		//Initializes factors in fund
+		for (int j = 0; j < factorNames->size(); j++) {
+			//Creates new factor with correct name and adds to investor
+			Factor currFactor(&factorNames->operator[](j));
+			currInvestor->addFactor(&currFactor);
+
+			//Gets value and adds to factor
+			getline(ss, item, fileDelimDefault);
+			currInvestor->setFactorValue(factorNames->operator[](j), stof(item));
+		}
+
+		//Adds initialized investor to fund
+		fund.addInvestor(*currInvestor);
+	}
+
+	input.close();
 }
 
 //Initialize the overall fund
@@ -168,7 +211,7 @@ vector<tm> DataIO::getDates(string filename, char delim) {
 	vector<tm> dates;
 	fstream input(filename);
 
-//Gets the first line of headers and makes date objects from them
+	//Gets the first line of headers and makes date objects from them
 	if (input.good()) {
 
 		getline(input, line);
@@ -199,8 +242,10 @@ vector<tm> DataIO::getDates(string filename, char delim) {
 				date.tm_year = stoi(line);
 			}
 
+			//Adds date to list
 			dates.push_back(date);
 		}
+
 	}
 
 	return dates;

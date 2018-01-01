@@ -12,6 +12,7 @@
 #include <fstream> //For ifstream and ofstream
 
 #include "DataIO.h"
+#include "Fund.h"
 using namespace std;
 
 /**
@@ -46,7 +47,7 @@ StockSelector::~StockSelector() {
  */
 int main() {
 	DataIO IOStream(stockFilenameDefault, investorFilenameDefault, fundFilenameDefault);
-	Fund fund = IOStream.initializeFundLocal();
+	fund = IOStream.initializeFundLocal();
 
 	login();
 
@@ -160,7 +161,7 @@ bool checkLogin(int mode) {
 	cin >> password;
 
 	//Checks if in database
-
+	cout << "Correct: " << fund.checkCredentials(username, password);
 	return true;
 }
 

@@ -12,8 +12,8 @@ using namespace std;
 
 //This class holds the values for different variables associated with a stock
 //EX) Volatility, Moving Average, etc..
-Factor::Factor(string factorName) {
-	name = factorName;
+Factor::Factor(string *factorName) {
+	name = *factorName;
 
 }
 

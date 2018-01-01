@@ -9,6 +9,7 @@
 #include "Stock.h"
 #include <string>
 #include <iostream>
+#include <exception>
 
 using namespace std;
 /**
@@ -35,6 +36,10 @@ void Fund::addStock(Stock stock) {
 
 }
 
+void Fund::addInvestor(Investor investor) {
+	investorList.insert(pair<string,Investor>(investor.getUsername(),investor));
+}
+
 bool Fund::stockExists(Stock stock) {
 	map<string, Stock>::iterator it;
 
@@ -49,20 +54,43 @@ bool Fund::stockExists(Stock stock) {
 	return false;
 }
 
-Stock Fund::getStock(std::string stockName) {
-	return stockList.find(stockName)->second;
+Stock* Fund::getStock(std::string stockName) {
+	return &stockList.find(stockName)->second;
 }
 
-void Fund::printStocks(tm Date) {
+//Just for testing
+void Fund::printStocks(tm Date, string factorName) {
 	map<string, Stock>::iterator it;
 
-
-	//cout << "Test";
 	for ( it = stockList.begin(); it != stockList.end(); it++ )
 	{
-
-		cout << it->second.getName() << ", " << it->second.getFactorValue("Price: Open", Date);
-
+		cout << it->second.getName() << " " << it->second.getFactorValue(factorName, Date) << endl;
 	}
 }
+
+//Just for testing
+void Fund::printInvestors(string factorName) {
+	map<string, Investor>::iterator it;
+
+	for ( it = investorList.begin(); it != investorList.end(); it++ )
+	{
+
+		cout << it->second.getUsername() << " " << it->second.getFactorValue(factorName) << endl;
+	}
+}
+
+bool Fund::checkCredentials(string username, string password) {
+	map<string, Investor>::iterator it;
+
+	for ( it = investorList.begin(); it != investorList.end(); it++ )
+	{
+		if (it->second.getUsername() == username && it->second.getPassword() == password)
+			return true;
+	}
+	return false;
+}
+
+//bool checkPassword(string pass) {
+
+//}
 
