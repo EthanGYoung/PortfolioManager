@@ -27,15 +27,15 @@ char invalidUser[]  = "Username or password not found. Please repeat or type to 
 
 //Main Prompts
 char managerMain[] = "Welcome to Manager Mode.\n******\nType any of the letters below to enter the corresponding option.\na. View statistics and performance.\nb. Edit/View investors\nc. "
-		"Edit/View stocks\nd. Edit/View Algorithm and Simulation settings\ne. Edit/View buying and selling settings\nf. Logout";
+		"Edit/View stocks\nd. Edit/View Algorithm and Simulation settings\ne. Edit/View buying and selling settings\nf. Run backtests\ng. Logout";
 char investorMain[] = "Welcome to Investor Mode.\n******\nType any of the letters below to enter the corresponding option.\na. View your stock history and projections.\nb. "
 		"Change investment amount.\nc. Edit your investor settings.\nd. Logout";
 char devMain[] = "Not implemented yet.";
-char newUserMain[] = "Not implemented yet.";
+string backtestPrompt = "Run simulation with algorithm..\na. Regression\nPredict dates over a period of..\na. 10 days\nb. 30 days\nc. 60 days\nStarting at date..\n(Example date 10/27/17)\n";
 
 //Input and output filenames
-string stockFilenameDefault = "StockData.csv";
-string investorFilenameDefault = "InvestorData.csv";
+string stockFilenameDefault = "/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/StockData.csv";
+string investorFilenameDefault = "/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/InvestorData.csv";
 string fundFilenameDefault = "FundData.csv";
 char fileDelimDefault = ',';
 string defaultFundName = "Portfolio";

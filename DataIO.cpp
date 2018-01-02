@@ -63,7 +63,8 @@ void DataIO::initializeStocksLocal() {
 	input.open(stockFilename);
 
 	//Reads in the headers to get the dates
-	vector<tm> dateInfo = getDates(stockFilename, fileDelimDefault);
+	vector<tm> dateInfo = getDates(stockFilename
+            , fileDelimDefault);
 
 	int i = 0;
 	//Reads and extracts each line of the file to get the stock information
@@ -131,63 +132,63 @@ void DataIO::initializeAllInvestorsLocal() {
 	int i = 0;
 	//Reads and extracts each line of the file to get the investor information
 	while (input.good()) {
-		i++;
+        i++;
 
-		//Gets the line in file
-		getline(input, line);
+        //Gets the line in file
+        getline(input, line);
 
-		stringstream ss(line);
+        stringstream ss(line);
 
 
 
-		//Extracts Headers and factor names
-		if (i == 1) {
-			//Parses header and gets the names of the factors
-			while (getline(ss, item, fileDelimDefault)) {
-				if (item == "Username" || item == "Password")
-					continue;
-				factorNames->push_back(item);
-			}
+        //Extracts Headers and factor names
+        if (i == 1) {
+            //Parses header and gets the names of the factors
+            while (getline(ss, item, fileDelimDefault)) {
+                if (item == "Username" || item == "Password")
+                    continue;
+                factorNames->push_back(item);
+            }
 
-			continue;
-		}
+            continue;
+        }
 
-		//Gets the name of the stock and create a new instance
-		getline(ss, item, fileDelimDefault);
-		string username = item;
-		getline(ss, item, fileDelimDefault);
-		string password = item;
+        //Gets the name of the stock and create a new instance
+        getline(ss, item, fileDelimDefault);
+        string username = item;
+        getline(ss, item, fileDelimDefault);
+        string password = item;
 
-		//Creates the investor as a pointer
-		Investor Inv(username, password);
-		currInvestor = &Inv;
+        //Creates the investor as a pointer
+        Investor Inv(username, password);
+        currInvestor = &Inv;
 
-		//Initializes factors in fund
-		for (int j = 0; j < factorNames->size(); j++) {
-			//Creates new factor with correct name and adds to investor
-			Factor currFactor(&factorNames->operator[](j));
-			currInvestor->addFactor(&currFactor);
+        //Initializes factors in fund
+        for (int j = 0; j < factorNames->size(); j++) {
+            //Creates new factor with correct name and adds to investor
+            Factor currFactor(&factorNames->operator[](j));
+            currInvestor->addFactor(&currFactor);
 
-			//Gets value and adds to factor
-			getline(ss, item, fileDelimDefault);
-			currInvestor->setFactorValue(factorNames->operator[](j), stof(item));
-		}
+            //Gets value and adds to factor
+            getline(ss, item, fileDelimDefault);
+            currInvestor->setFactorValue(factorNames->operator[](j), stof(item));
+        }
 
-		//Adds initialized investor to fund
-		fund.addInvestor(*currInvestor);
-	}
+        //Adds initialized investor to fund
+        fund.addInvestor(*currInvestor);
+    }
 
 	input.close();
 }
 
 //Initialize the overall fund
-Fund DataIO::initializeFundLocal() {
+Fund * DataIO::initializeFundLocal() {
 	cout << "Initializing Fund" << endl;
 
 	this->initializeStocksLocal();
 	this->initializeAllInvestorsLocal();
 
-	return fund;
+	return &fund;
 }
 
 //Export the investor data to the file

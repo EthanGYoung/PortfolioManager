@@ -31,7 +31,7 @@ public:
 	void exportStocksLocal();
 	vector<tm> getDates(string filename, char delim);
 	//Importing the data from computer
-	Fund initializeFundLocal();
+    Fund * initializeFundLocal();
 
 	//Exporting the Data
 	void exportFundLocal();

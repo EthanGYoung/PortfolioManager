@@ -27,9 +27,8 @@ int investorPrompt();
 int managerPrompt();
 int developerPrompt();
 int newUserPrompt();
-bool checkLogin(int prompt);
-bool initializeInvestors();
-static Fund fund;
+bool checkLogin(int mode);
+static Fund *fund;
 
 class StockSelector {
 public:

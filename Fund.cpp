@@ -58,6 +58,10 @@ Stock* Fund::getStock(std::string stockName) {
 	return &stockList.find(stockName)->second;
 }
 
+map<std::string, Stock>* Fund::getStockList() {
+    return &stockList;
+}
+
 //Just for testing
 void Fund::printStocks(tm Date, string factorName) {
 	map<string, Stock>::iterator it;
@@ -71,10 +75,10 @@ void Fund::printStocks(tm Date, string factorName) {
 //Just for testing
 void Fund::printInvestors(string factorName) {
 	map<string, Investor>::iterator it;
+	cout << "Here";
 
 	for ( it = investorList.begin(); it != investorList.end(); it++ )
 	{
-
 		cout << it->second.getUsername() << " " << it->second.getFactorValue(factorName) << endl;
 	}
 }
@@ -84,13 +88,9 @@ bool Fund::checkCredentials(string username, string password) {
 
 	for ( it = investorList.begin(); it != investorList.end(); it++ )
 	{
-		if (it->second.getUsername() == username && it->second.getPassword() == password)
+		if (it->second.getUsername() == username && it->second.getPassword() == password) {
 			return true;
+		}
 	}
 	return false;
 }
-
-//bool checkPassword(string pass) {
-
-//}
-

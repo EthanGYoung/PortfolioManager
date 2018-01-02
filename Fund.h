@@ -27,6 +27,7 @@ public:
 	Stock* getStock(std::string stockName);
 	void printStocks(tm Date, std::string factorName);
 	void printInvestors(string factorName);
+	std::map<std::string, Stock>* getStockList();
 	//void setDateList(std::vector<tm> dl);
 private:
 	std::string name;

@@ -6,13 +6,11 @@
  */
 
 #include "StockSelector.h"
-#include "Config.h"
-#include <string>
 #include <iostream> //For cin and cout
-#include <fstream> //For ifstream and ofstream
-
 #include "DataIO.h"
-#include "Fund.h"
+#include "Backtest.h"
+
+
 using namespace std;
 
 /**
@@ -113,6 +111,12 @@ int managerPrompt() {
 	cout << managerMain << endl;
 	cin >> option;
 
+    // Run backtest prompt
+    if (option == 'f') {
+        Backtest *bt;
+        bt->userBacktestMain();
+    }
+
 	return 0;
 }
 
@@ -139,7 +143,7 @@ int newUserPrompt() {
 	cout << "New User" << endl;
 
 	//Gets the menu option
-	cout << newUserMain << endl;
+	//cout << newUserMain << endl;
 	cin >> option;
 
 	return 0;
@@ -152,32 +156,23 @@ bool checkLogin(int mode) {
 	string username;
 	string password;
 
-	//Gets username
-	cout << usernamePrompt << endl;
-	cin >> username;
+	while (true) {
+		//Gets username
+		cout << usernamePrompt << endl;
+		cin >> username;
 
-	//Gets password
-	cout << passwordPrompt << endl;
-	cin >> password;
+		if (username == "QUIT")
+			return false;
 
-	//Checks if in database
-	cout << "Correct: " << fund.checkCredentials(username, password);
-	return true;
-}
+		//Gets password
+		cout << passwordPrompt << endl;
+		cin >> password;
 
-//Format for each line username:password:initDate:initAmount
-bool initializeInvestors(string filename) {
-	cout << "Not Tested Yet\n";
-	//Declares a variable of type ifstream called inFile
-	ifstream inFile;
+		//Checks if in database
+		if (fund->checkCredentials(username, password)) {
+			return true;
+		}
 
-	//Opens file and checks to see if it was a success
-	inFile.open(filename);
-
-	if (inFile.fail()) {
-		cout << "Failed to open file\n";
+		cout << invalidUser << endl;
 	}
-
-
-	return true;
 }
