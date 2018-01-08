@@ -12,7 +12,8 @@ class Algorithm {
 public:
     Algorithm();
     virtual ~Algorithm();
-    void predictDate(Fund *fund, tm Date, Stock *st);
+    void predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faName);
+    int getDateIndex(tm* Date, Stock *st, Fund *fund);
 };
 
 

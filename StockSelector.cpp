@@ -113,8 +113,8 @@ int managerPrompt() {
 
     // Run backtest prompt
     if (option == 'f') {
-        Backtest *bt;
-        bt->userBacktestMain();
+        Backtest *bt = new Backtest();
+        bt->userBacktestMain(fund);
     }
 
 	return 0;

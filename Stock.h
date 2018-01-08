@@ -31,12 +31,12 @@ public:
 	//void setPriceHigh(tm Date, float price);
 	//void setPriceLow(tm Date, float price);
 	//void setVolume(tm Date, int vol);
-	float getFactorValue(std::string factorName, tm Date); //Return -1 if factor doesnt exist
-	void setFactorValue(std::string factorName, tm Date, float value);
+	float getFactorValue(std::string factorName, tm* Date); //Return -1 if factor doesnt exist
+	void setFactorValue(std::string factorName, tm* Date, float value);
 	void addFactor(Factor factor);
 	std::string getName();
+	int convertDate(tm* Date);
 private:
-	int convertDate(tm Date);
 	//std::map<int, float> priceClose;
 	//std::map<int, float> priceOpen;
 	//std::map<int, float> priceHigh;

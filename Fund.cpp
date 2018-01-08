@@ -31,7 +31,7 @@ Fund::~Fund() {
 }
 
 void Fund::addStock(Stock stock) {
-
+    cout << "Adding stock to fund" << endl;
 	stockList.insert(pair<string,Stock>(stock.getName(),stock));
 
 }
@@ -41,6 +41,7 @@ void Fund::addInvestor(Investor investor) {
 }
 
 bool Fund::stockExists(Stock stock) {
+    cout << "Checking if stock exists in fund" << endl;
 	map<string, Stock>::iterator it;
 
 	for ( it = stockList.begin(); it != stockList.end(); it++ )
@@ -55,20 +56,30 @@ bool Fund::stockExists(Stock stock) {
 }
 
 Stock* Fund::getStock(std::string stockName) {
-	return &stockList.find(stockName)->second;
+    cout << "Getting stock in fund" << endl;
+    map<string, Stock>::iterator it;
+
+    for ( it = stockList.begin(); it != stockList.end(); it++ )
+    {
+        if (it->second.getName() == stockName) {
+            return &(it->second);
+        }
+    }
+	return &(it->second);
 }
 
 map<std::string, Stock>* Fund::getStockList() {
+    cout << "Getting Stock List from fund" << endl;
     return &stockList;
 }
 
 //Just for testing
-void Fund::printStocks(tm Date, string factorName) {
+void Fund::printStocks() {
 	map<string, Stock>::iterator it;
 
 	for ( it = stockList.begin(); it != stockList.end(); it++ )
 	{
-		cout << it->second.getName() << " " << it->second.getFactorValue(factorName, Date) << endl;
+		cout << it->second.getName()  << endl;
 	}
 }
 
@@ -84,6 +95,7 @@ void Fund::printInvestors(string factorName) {
 }
 
 bool Fund::checkCredentials(string username, string password) {
+    cout << "Checking Credentials in Fund" << endl;
 	map<string, Investor>::iterator it;
 
 	for ( it = investorList.begin(); it != investorList.end(); it++ )
@@ -93,4 +105,30 @@ bool Fund::checkCredentials(string username, string password) {
 		}
 	}
 	return false;
+}
+
+void Fund::setDateList(vector<tm*> *dl) {
+    cout << "Setting Date List in Fund" << endl;
+    /*cout << "Fund->getDateList(): " << dl->operator[](0)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dl->operator[](1)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dl->operator[](2)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dl->operator[](3)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dl->operator[](4)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dl->operator[](5)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dl->operator[](6)->tm_mon << endl;*/
+    dateList = dl;
+
+}
+
+std::vector<tm*>* Fund::getDateList() {
+    cout << "Getting Date List in Fund" << endl;
+	/*cout << "Fund->getDateList(): " << dateList->operator[](0)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dateList->operator[](1)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dateList->operator[](2)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dateList->operator[](3)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dateList->operator[](4)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dateList->operator[](5)->tm_mon << endl;
+    cout << "Fund->getDateList(): " << dateList->operator[](6)->tm_mon << endl;*/
+
+    return dateList;
 }

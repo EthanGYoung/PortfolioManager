@@ -55,6 +55,7 @@ void DataIO::initializeStocksLocal() {
 
 	cout << "Initializing Stocks\n";
 
+
 	extern char fileDelimDefault; //Delimiter in file
 	string line; //Line in file
 	string item; //Item extracted before delimeter
@@ -63,8 +64,10 @@ void DataIO::initializeStocksLocal() {
 	input.open(stockFilename);
 
 	//Reads in the headers to get the dates
-	vector<tm> dateInfo = getDates(stockFilename
+	vector<tm*> *dateInfo = getDates(stockFilename
             , fileDelimDefault);
+
+    fund.setDateList(dateInfo);
 
 	int i = 0;
 	//Reads and extracts each line of the file to get the stock information
@@ -101,11 +104,11 @@ void DataIO::initializeStocksLocal() {
 		currStock->addFactor(currFactor);
 
 		//Sets the value for factor at specified date for stock
-		for (int i = 0; i < dateInfo.size(); i++) {
+		for (int i = 0; i < dateInfo->size(); i++) {
 			//Gets the next price
 			getline(ss, item, fileDelimDefault);
 			currStock->setFactorValue(currFactor.getName(),
-					dateInfo.operator[](i), stof(item));
+					dateInfo->operator[](i), stof(item));
 		}
 
 	}
@@ -206,10 +209,12 @@ void DataIO::exportStocksLocal() { //Needed?
 	cout << "Exporting Stocks" << endl;
 }
 
-vector<tm> DataIO::getDates(string filename, char delim) {
-	tm date = tm();
+vector<tm*>* DataIO::getDates(string filename, char delim) {
+    cout << "Getting Dates." << endl;
 	string line;
-	vector<tm> dates;
+
+	vector<tm*> *dates = new vector<tm*>();
+
 	fstream input(filename);
 
 	//Gets the first line of headers and makes date objects from them
@@ -227,24 +232,24 @@ vector<tm> DataIO::getDates(string filename, char delim) {
 			if (i < 3)
 				continue;
 
-			date = tm();
+			tm *date = new tm();
 
 			stringstream ss(line);
 			//Split at the / to get the date
 			if (getline(ss, line, '/')) {
-				date.tm_mon = stoi(line) - 1;
+				date->tm_mon = stoi(line) - 1;
 			}
 
 			if (getline(ss, line, '/')) {
-				date.tm_mday = stoi(line);
+				date->tm_mday = stoi(line);
 			}
 
 			if (getline(ss, line, '/')) {
-				date.tm_year = stoi(line);
+				date->tm_year = stoi(line);
 			}
 
 			//Adds date to list
-			dates.push_back(date);
+			dates->push_back(date);
 		}
 
 	}

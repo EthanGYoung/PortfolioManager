@@ -18,17 +18,18 @@ Backtest::~Backtest() {
 //Calls algorithm methods to predict dates in Dates using stocks in fund (Predicts all stocks)
 //Writes results to the fund (Maybe do 30 day results and 10 day results
 void Backtest::runBacktestStocks(Algorithm *algo, std::vector<tm> Dates, Fund *fund) {
+    cout << "Running Backtest in backtest" << endl;
     map<std::string, Stock>* stocks = fund->getStockList();
     map<std::string, Stock>::iterator it;
 
     //Loops through each date
-    for (int i = 0; i < Dates.size(); i++) {
+    for (int i = 0; i < (int)Dates.size(); i++) {
         //Loops through each stock
         for ( it = stocks->begin(); it != stocks->end(); it++ )
         {
             //Predict the date passed in for each stocks
             //TODO: Save the prediction and save actuals for each stock
-            algo->predictDate(&(*fund), Dates.operator[](i), &it->second);
+            //algo->predictDate(&(*fund), &(Dates.operator[](i)), &it->second);
         }
     }
 }
@@ -44,9 +45,10 @@ double Backtest::compareMagnitude(double prediction, double actual) {
 }
 
 void Backtest::userBacktestMain(Fund *fund) {
+    cout << "Running Backtest main in backtest" << endl;
     cout << backtestPrompt;
-    Algorithm *al;
-    tm *dateObj;
+    Algorithm *al = new Algorithm();
+    //tm *dateObj;
 
 
     string algo;
@@ -63,8 +65,16 @@ void Backtest::userBacktestMain(Fund *fund) {
     cin >> date;
 
     //Implement when more than one algorithm
-    if (algo == 'a');
+    //if (algo == "a");
+    cout << "Here";
+    vector<tm*>* dates = fund->getDateList();
+
+    vector<string> *fa = new vector<string>();
+    fa->push_back("MovingAverage");
+    fa->push_back("Volatility");
+    fa->push_back("MovingAverage");
+    fa->push_back("MovingAverage");
 
     //Call method that converts date string to actual date
-
+    al->predictDate(fund, dates->operator[](5), fund->getStock("GOOG"), fa);
 }

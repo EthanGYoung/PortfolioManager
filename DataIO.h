@@ -29,7 +29,7 @@ public:
 	void initializeAllInvestorsLocal();
 	void exportInvestorsLocal();
 	void exportStocksLocal();
-	vector<tm> getDates(string filename, char delim);
+	vector<tm*>* getDates(string filename, char delim);
 	//Importing the data from computer
     Fund * initializeFundLocal();
 

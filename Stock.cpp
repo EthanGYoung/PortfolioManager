@@ -23,7 +23,7 @@ Stock::Stock(string stockName) {
 
 // Make sure to free all the memory
 Stock::~Stock() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 // Buys the stock
@@ -33,23 +33,24 @@ bool Stock::buy() {
 }
 
 // Sells the stock
+//We trying
 bool Stock::sell() {
 	cout << "Implement sell stock." << endl;
 	return true;
 }
 
 //Converts date to an int for indexing the maps
-int Stock::convertDate(tm Date) {
-	return Date.tm_mon *1000000 + Date.tm_mday*10000 + Date.tm_year + 2000;
+int Stock::convertDate(tm* Date) {
+	return Date->tm_mon *1000000 + Date->tm_mday*10000 + Date->tm_year + 2000;
 }
 
 
 //Return -1 if factor doesnt exist
-float Stock::getFactorValue(std::string factorName, tm Date) {
+float Stock::getFactorValue(std::string factorName, tm* Date) {
 	return Factors.at(factorName).getValue(convertDate(Date));
 }
 
-void Stock::setFactorValue(std::string factorName, tm Date, float value) {
+void Stock::setFactorValue(std::string factorName, tm* Date, float value) {
 	Factors.find(factorName)->second.setValue(convertDate(Date), value);
 }
 
