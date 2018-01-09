@@ -58,7 +58,7 @@ void Backtest::userBacktestMain(Fund *fund) {
     cout << "Algorithm:" << endl;
     cin >> algo;
 
-    cout << "Period:" << endl;
+    cout << "Period (int):" << endl;
     cin >> period;
 
     cout << "Starting Date:" << endl;
@@ -66,15 +66,38 @@ void Backtest::userBacktestMain(Fund *fund) {
 
     //Implement when more than one algorithm
     //if (algo == "a");
-    cout << "Here";
-    vector<tm*>* dates = fund->getDateList();
+
+
 
     vector<string> *fa = new vector<string>();
-    fa->push_back("MovingAverage");
-    fa->push_back("Volatility");
-    fa->push_back("MovingAverage");
-    fa->push_back("MovingAverage");
+    fa->push_back("LowPrice");
+    fa->push_back("HighPrice");
+    fa->push_back("Volume");
 
-    //Call method that converts date string to actual date
-    al->predictDate(fund, dates->operator[](5), fund->getStock("GOOG"), fa);
+    map<string, Stock>* sl = fund->getStockList();
+    map<string, Stock>::iterator it;
+    vector<tm*>* dates = fund->getDateList();
+    vector<tm*>::iterator itr;
+
+
+    //Loop through all stocks
+    for (it = sl->begin(); it != sl->end(); it++) {
+        itr = dates->begin() + 50;
+        //Loop through each date within the stock
+        for (int i = 0; i < 100; i++) {
+
+            double pred = al->predictDate(fund, *itr, fund->getStock(it->second.getName()), fa);
+
+            //Predicts the current date with the stock iterating through
+            it->second.addPred("Regression", pred, it->second.convertDate(*itr));
+            itr++;
+        }
+    }
+    //itr = dates->begin() + 50;
+    //for (int i = 0; i < 2; i++) {
+    //    cout << "First Date: " << it->second.convertDate(*itr);
+    //    itr++;
+    //}
+
+
 }

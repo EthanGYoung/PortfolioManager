@@ -21,27 +21,19 @@ public:
 	virtual ~Stock();
 	bool buy();
 	bool sell();
-	//float getPriceClose(tm Date);
-	//float getPriceOpen(tm Date);
-	//float getPriceHigh(tm Date);
-	//float getPriceLow(tm Date);
-	//int getVolume(tm Date);
-	//void setPriceClose(tm Date, float price);
-	//void setPriceOpen(tm Date, float price);
-	//void setPriceHigh(tm Date, float price);
-	//void setPriceLow(tm Date, float price);
-	//void setVolume(tm Date, int vol);
 	float getFactorValue(std::string factorName, tm* Date); //Return -1 if factor doesnt exist
 	void setFactorValue(std::string factorName, tm* Date, float value);
 	void addFactor(Factor factor);
 	std::string getName();
 	int convertDate(tm* Date);
+    void addPred(std::string algoName, double value, int date);
+    std::map<int,double>* getPredList(std::string algoName);
 private:
 	//std::map<int, float> priceClose;
 	//std::map<int, float> priceOpen;
 	//std::map<int, float> priceHigh;
 	//std::map<int, float> priceLow;
-	//std::map<int, int> volume;
+	std::map<std::string, std::map<int,double>*> predAlgorithms;
 	//std::map<int, float> purchaseHistory;
 	std::map<std::string, Factor> Factors;
 	int numDays;

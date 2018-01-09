@@ -14,7 +14,8 @@ Algorithm::~Algorithm() {
 
 }
 
-int testInterval = 2; //The number of days to run regression on
+//TODO: Make some global variables instead of passing so many parameters
+int testInterval = 30; //The number of days to run regression on
 
 //Dates are chosen by the backtest will predict the Date passed in
 //Date: The date to be predicted
@@ -28,7 +29,7 @@ int testInterval = 2; //The number of days to run regression on
     //Get coefficients A, B, C, ..
     //Use to predict the current day of the date passed in
     //Return the predicted value or whether increase or decrease
-void Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faName) {
+double Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faName) {
     cout << "predictDate in algorithm" << endl;
 
     glp_prob *lp; //LP instance
@@ -63,11 +64,10 @@ void Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faN
 
     //Gets actuals for the bounds and goes backwards to the correct date
     cout << "Actuals loop in algorithm" << endl;
-    cout << "Accessing element: " << indexVal << endl;
+        cout << "Predicting Date: " << st->convertDate(Date) << endl;
     for (it = dates->begin() + indexVal;  i < testInterval + 1;  it++) {
+        cout << "Actual: " << st->convertDate(*it) << endl;
         double actual = st->getFactorValue("OpenPrice",*it);
-        cout << "Actual: " << actual << endl;
-
         //Equality constraint
         glp_set_row_bnds(lp, i, GLP_FX, actual, actual);
         i++;
@@ -75,7 +75,6 @@ void Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faN
 
     //Number variables in factor size + numConstraints*2 (2 errors for each constraint)
     int numVars = (int)(faName->size() + testInterval * 2);
-
     //Creates the variables
     glp_add_cols(lp, numVars);
 
@@ -96,11 +95,10 @@ void Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faN
     for (itr = faName->begin(); itr != faName->end(); itr++) {
         i = 1;
         varNum++;
-        cout << "Factor: " << (*itr) << endl;
 
-        //Loops through constraints and sets coefficients
-        for (it = dates->begin() + indexVal; i < testInterval + 1; it++) {
-            cout << "Var: " << varNum << endl;
+        //Loops through constraints and sets coefficients (-1 because using prevday's data to predict next day)
+        for (it = dates->begin() + indexVal - 1; i < testInterval + 1; it++) {
+            cout << "Factor: " << *itr << " Date: " << st->convertDate(*it) << endl;
             ia[j] = i; //Loops through constraints
             ja[j] = varNum; //Loops through variables
             ar[j] = st->getFactorValue(*itr, *it);
@@ -113,7 +111,6 @@ void Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faN
     for (int n = 1; n < testInterval + 1; n++) {
         //Loops through all possible error values
         for (int k = (int)faName->size() + 1; k < 2 * testInterval + 1 + (int)faName->size(); k++) {
-            //Can loop through a factor list here in the future
             ia[j] = n; //Loops through constraints
             ja[j] = k; //Loops over error variables
 
@@ -133,7 +130,7 @@ void Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faN
 
     //Prints out matrix for testing
     //for (int k = 1; k < size; k++) {
-    //    cout << "k = " << k << " IA = " << ia[k] << " JA = " << ja[k] << " AR = " << ar[k] << endl;
+     //   cout << "k = " << k << " IA = " << ia[k] << " JA = " << ja[k] << " AR = " << ar[k] << endl;
     //}
 
     //Load matrix into program
@@ -157,7 +154,7 @@ void Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *faN
 
     glp_delete_prob(lp);
 
-
+    return getPrediction(results, faName, st, getDateIndex(Date, st, fund), dates);
 
 }
 
@@ -181,4 +178,19 @@ int Algorithm::getDateIndex(tm* Date, Stock *st, Fund *fund) {
 
     //If the date doesn't exist
     return -1;
+}
+
+double Algorithm::getPrediction(double result[], vector<string> *faName, Stock *stk, int index, vector<tm*> *dates) {
+    double prediction; //The predicted value for the date passed in
+    vector<tm*>::iterator it;
+    it = dates->begin() + index;
+    cout << "Getting Prediction for date: " << stk->convertDate(*it) << endl;
+    cout << "Using dates from: " << stk->convertDate(*(it - 1)) << endl;
+    //Loops through each variable and calculates with prediction date data
+    for (int i = 1; i < (int)faName->size() + 1; i++) {
+        prediction = prediction + stk->getFactorValue(faName->operator[](i - 1), *(it - 1)) * result[i];
+        cout << "Pred: " << prediction << endl;
+    }
+
+    return prediction;
 }

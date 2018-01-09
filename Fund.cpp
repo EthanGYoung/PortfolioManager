@@ -31,7 +31,7 @@ Fund::~Fund() {
 }
 
 void Fund::addStock(Stock stock) {
-    cout << "Adding stock to fund" << endl;
+    //cout << "Adding stock: "<< stock.getName() << " to fund" << endl;
 	stockList.insert(pair<string,Stock>(stock.getName(),stock));
 
 }
@@ -41,7 +41,7 @@ void Fund::addInvestor(Investor investor) {
 }
 
 bool Fund::stockExists(Stock stock) {
-    cout << "Checking if stock exists in fund" << endl;
+   // cout << "Checking if stock exists in fund" << endl;
 	map<string, Stock>::iterator it;
 
 	for ( it = stockList.begin(); it != stockList.end(); it++ )
@@ -56,7 +56,7 @@ bool Fund::stockExists(Stock stock) {
 }
 
 Stock* Fund::getStock(std::string stockName) {
-    cout << "Getting stock in fund" << endl;
+    //cout << "Getting stock in fund" << endl;
     map<string, Stock>::iterator it;
 
     for ( it = stockList.begin(); it != stockList.end(); it++ )
@@ -86,7 +86,6 @@ void Fund::printStocks() {
 //Just for testing
 void Fund::printInvestors(string factorName) {
 	map<string, Investor>::iterator it;
-	cout << "Here";
 
 	for ( it = investorList.begin(); it != investorList.end(); it++ )
 	{

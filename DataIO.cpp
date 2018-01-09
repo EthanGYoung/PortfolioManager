@@ -104,7 +104,7 @@ void DataIO::initializeStocksLocal() {
 		currStock->addFactor(currFactor);
 
 		//Sets the value for factor at specified date for stock
-		for (int i = 0; i < dateInfo->size(); i++) {
+		for (int i = 0; i < (int)dateInfo->size(); i++) {
 			//Gets the next price
 			getline(ss, item, fileDelimDefault);
 			currStock->setFactorValue(currFactor.getName(),
@@ -167,7 +167,7 @@ void DataIO::initializeAllInvestorsLocal() {
         currInvestor = &Inv;
 
         //Initializes factors in fund
-        for (int j = 0; j < factorNames->size(); j++) {
+        for (int j = 0; j < (int)factorNames->size(); j++) {
             //Creates new factor with correct name and adds to investor
             Factor currFactor(&factorNames->operator[](j));
             currInvestor->addFactor(&currFactor);
