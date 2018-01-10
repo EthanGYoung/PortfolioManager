@@ -66,7 +66,7 @@ double Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *f
     cout << "Actuals loop in algorithm" << endl;
         cout << "Predicting Date: " << st->convertDate(Date) << endl;
     for (it = dates->begin() + indexVal;  i < testInterval + 1;  it++) {
-        cout << "Actual: " << st->convertDate(*it) << endl;
+        //cout << "Actual: " << st->convertDate(*it) << endl;
         double actual = st->getFactorValue("OpenPrice",*it);
         //Equality constraint
         glp_set_row_bnds(lp, i, GLP_FX, actual, actual);
@@ -98,7 +98,7 @@ double Algorithm::predictDate(Fund *fund, tm *Date, Stock *st, vector<string> *f
 
         //Loops through constraints and sets coefficients (-1 because using prevday's data to predict next day)
         for (it = dates->begin() + indexVal - 1; i < testInterval + 1; it++) {
-            cout << "Factor: " << *itr << " Date: " << st->convertDate(*it) << endl;
+           // cout << "Factor: " << *itr << " Date: " << st->convertDate(*it) << endl;
             ia[j] = i; //Loops through constraints
             ja[j] = varNum; //Loops through variables
             ar[j] = st->getFactorValue(*itr, *it);
@@ -189,7 +189,7 @@ double Algorithm::getPrediction(double result[], vector<string> *faName, Stock *
     //Loops through each variable and calculates with prediction date data
     for (int i = 1; i < (int)faName->size() + 1; i++) {
         prediction = prediction + stk->getFactorValue(faName->operator[](i - 1), *(it - 1)) * result[i];
-        cout << "Pred: " << prediction << endl;
+        //cout << "Pred: " << prediction << endl;
     }
 
     return prediction;

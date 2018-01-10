@@ -14,7 +14,6 @@ using namespace std;
 //EX) Volatility, Moving Average, etc..
 Factor::Factor(string *factorName) {
 	name = *factorName;
-
 }
 
 Factor::~Factor() {
