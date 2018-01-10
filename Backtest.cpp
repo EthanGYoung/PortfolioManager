@@ -1,6 +1,6 @@
 //
 // Created by Ethan Young on 1/1/18.
-//
+// Tested
 
 #include "Backtest.h"
 #include <iostream>
@@ -22,6 +22,7 @@ Backtest::Backtest(Fund *fund) {
         prevDayDiffActual.insert(
                 pair<string, std::map<int, double> *>(it->second.getName(), new std::map<int, double>()));
     }
+    cout << "gittest Backtes" << endl;
 }
 
 Backtest::~Backtest() {
