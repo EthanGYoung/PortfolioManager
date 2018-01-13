@@ -23,7 +23,7 @@ using namespace std;
  * @author E
  */
 Fund::Fund() {
-
+	stockList = new map<string,Stock>();
 }
 
 Fund::~Fund() {
@@ -32,7 +32,7 @@ Fund::~Fund() {
 
 void Fund::addStock(Stock stock) {
     //cout << "Adding stock: "<< stock.getName() << " to fund" << endl;
-	stockList.insert(pair<string,Stock>(stock.getName(),stock));
+	stockList->insert(pair<string,Stock>(stock.getName(),stock));
 
 }
 
@@ -41,10 +41,10 @@ void Fund::addInvestor(Investor investor) {
 }
 
 bool Fund::stockExists(Stock stock) {
-   // cout << "Checking if stock exists in fund" << endl;
+   //cout << "Checking if stock exists in fund" << endl;
 	map<string, Stock>::iterator it;
 
-	for ( it = stockList.begin(); it != stockList.end(); it++ )
+	for ( it = stockList->begin(); it != stockList->end(); it++ )
 	{
 		//Second is the value
 		if (it->second.getName() == stock.getName()) {
@@ -59,7 +59,7 @@ Stock* Fund::getStock(std::string stockName) {
     //cout << "Getting stock in fund" << endl;
     map<string, Stock>::iterator it;
 
-    for ( it = stockList.begin(); it != stockList.end(); it++ )
+    for ( it = stockList->begin(); it != stockList->end(); it++ )
     {
         if (it->second.getName() == stockName) {
             return &(it->second);
@@ -70,14 +70,14 @@ Stock* Fund::getStock(std::string stockName) {
 
 map<std::string, Stock>* Fund::getStockList() {
     cout << "Getting Stock List from fund" << endl;
-    return &stockList;
+    return stockList;
 }
 
 //Just for testing
 void Fund::printStocks() {
 	map<string, Stock>::iterator it;
 
-	for ( it = stockList.begin(); it != stockList.end(); it++ )
+	for ( it = stockList->begin(); it != stockList->end(); it++ )
 	{
 		cout << it->second.getName()  << endl;
 	}

@@ -256,4 +256,3 @@ vector<tm*>* DataIO::getDates(string filename, char delim) {
 
 	return dates;
 }
-

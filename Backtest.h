@@ -23,16 +23,26 @@ public:
     std::map<std::string, std::map<int,double>*> difference;
     std::map<std::string, std::map<int,double>*> prevDayDiffPred;
     std::map<std::string, std::map<int,double>*> prevDayDiffActual;
-    std::map<std::string, double> percentCorrect;
-    Backtest(Fund *fund);
+    std::vector<tm *> *dates;
+    std::map<string, Stock> *sl;
+    std::map<std::string, double> *percentCorrect;
+    std::map<std::string, double> *increase;
+    vector<string> *factorNames;
+    int numDays;
+    int startDate;
+    int interval;
+    tm *predictDate;
+    Algorithm *al;
+    Fund *fund;
+    Backtest(Fund *fundEx, int interva, vector<string> *factors, int numDay, tm *predictedDate);
     virtual ~Backtest();
-    void runBacktestStocks(Algorithm *al, Fund *fund, vector<string> *fa, int numDays, int startDate);
-    bool compareDirection(double prediction, double actual);
-    double compareMagnitude(double prediction, double actual);
-    void userBacktestMain(Fund *fund);
-    void analyzeResults(Fund *fund);
-    void calcPrevDayChange(Fund *fund, int numDays, int startDate);
-    void calcPercentCorrect(Fund *fund, int numDays, int startDate);
+    void runBacktestStocks();
+    void userBacktestMain();
+    void calcPrevDayChange();
+    void calcPercentCorrect();
+    void predictDay();
+    int getDateIndx(tm *Date);
+
 };
 
 

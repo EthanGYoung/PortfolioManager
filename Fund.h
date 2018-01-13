@@ -32,7 +32,7 @@ public:
 	std::vector<tm*>* getDateList();
 private:
 	std::string name;
-	std::map<std::string, Stock> stockList;
+	std::map<std::string, Stock> *stockList;
 	std::map<std::string, Investor> investorList;
 	std::vector<tm*> *dateList;
 };

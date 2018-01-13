@@ -113,8 +113,24 @@ int managerPrompt() {
 
     // Run backtest prompt
     if (option == 'f') {
-        Backtest *bt = new Backtest(fund);
-        bt->userBacktestMain(fund);
+		//Testing only
+        int interval = 30;
+        int numDays = 10;
+		tm *predictDate = new tm();
+		predictDate->tm_mday = 28;
+		predictDate->tm_mon = 6;
+		predictDate->tm_year = 17;
+
+        //Prompt user for possible factors to include
+        vector <string> *factorNames = new vector<string>();
+        factorNames->push_back("LowPrice");
+        factorNames->push_back("HighPrice");
+        factorNames->push_back("Volume");
+
+		//Creates new backtest and runs it
+        Backtest *bt = new Backtest(fund, interval, factorNames, numDays, predictDate);
+
+        bt->userBacktestMain();
     }
 
 	return 0;
@@ -176,3 +192,5 @@ bool checkLogin(int mode) {
 		cout << invalidUser << endl;
 	}
 }
+
+
