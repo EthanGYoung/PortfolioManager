@@ -34,6 +34,7 @@ public:
     tm *predictDate;
     Algorithm *al;
     Fund *fund;
+    void btResults(double* results);
     Backtest(Fund *fundEx, int interva, vector<string> *factors, int numDay, tm *predictedDate);
     virtual ~Backtest();
     void runBacktestStocks();

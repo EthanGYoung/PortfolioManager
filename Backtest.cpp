@@ -45,27 +45,32 @@ Backtest::~Backtest() {
 
 //Predicts a date without comparing it to actuals (Since might not have actuals yet)
 void Backtest::predictDay() {
-
+    cout << "Start of predict Day" << endl;
     map<string, Stock>::iterator stock;
     stock = sl->begin();
-    int date = stock->second.convertDate(predictDate);
+    vector<tm *>::iterator dt;
+    dt = dates->begin() + getDateIndx(predictDate) - 1;
 
     //Loop through all stocks
     for (stock = sl->begin(); stock != sl->end(); stock++) {
+
         //Predicts given day and adds to predicted map
         double pred = al->predictDate(predictDate, fund->getStock(stock->second.getName()));
+        double prevActual = fund->getStock(stock->second.getName())->getFactorValue("OpenPrice", *dt);
+
         (*(predicted.find(stock->second.getName())->second))[stock->second.convertDate(predictDate)] = pred;
 
-        if (pred > 0) {
+        if (pred - prevActual > 0) {
             increase->insert(pair<string, double>(stock->second.getName(), 1));
         } else {
             increase->insert(pair<string, double>(stock->second.getName(), 0));
         }
     }
-    cout << "Start of predict Day     Date: " << date << endl;
+
     cout << "End of predict Day" << endl;
 
 }
+
 //Calls algorithm methods to predict dates in Dates using stocks in fund (Predicts all stocks)
 //Writes results to the fund (Maybe do 30 day results and 10 day results
 void Backtest::runBacktestStocks() {
@@ -77,22 +82,26 @@ void Backtest::runBacktestStocks() {
     for (stock = sl->begin(); stock != sl->end(); stock++) {
         date = dates->begin() + startDate - 1; // -1 because use prev day later on, so need to initialize it
 
-        //Loop through each date within the stock
-        for (int i = 0; i < numDays + 1; i++) {
-
+        //Loop through each date within the stock //Fix!!
+        for (int i = 0; i < numDays + 2; i++) {
+            cout << "Running backtest stocks" << endl;
             //Gets predicted value and actual value for "OpenPrice" for today's date
             double pred = al->predictDate(*date, fund->getStock(stock->second.getName()));
+
             double actual = fund->getStock(stock->second.getName())->getFactorValue("OpenPrice", *date);
 
-            //Saves teh actual value in the actuals map
+            //Saves the actual value in the actuals map
             map<int,double>* actList = actuals.find(stock->second.getName())->second;
             (*actList)[stock->second.convertDate(*date)] = actual;
 
             //Saves predicted value in predicted map and saves the diff between in difference
             (*(predicted.find(stock->second.getName())->second))[stock->second.convertDate(*date)] = pred;
+
             (*(difference.find(stock->second.getName())->second))[stock->second.convertDate(*date)] = actual - pred;
 
-            date++;
+            if (i != numDays + 1) {
+                date++;
+            }
         }
         cout << "!*!*!*!*!*!!*!*!*Last date tested: " << stock->second.convertDate(*date) << endl;
     }
@@ -121,22 +130,45 @@ void Backtest::userBacktestMain() {
     calcPercentCorrect();
     predictDay();
 
-    al->selectStockDistribution(predictDate, percentCorrect, increase);
+    double* results = al->selectStockDistribution(percentCorrect, increase);
+    btResults(results);
 
 }
 
+void Backtest::btResults(double* results) {
+    sl;
+    prevDayDiffActual;
+    int profit = 0;
+    map<string, Stock>::iterator stock;
+
+    int h = 1;
+    //Loops through and calculates how much is made
+    for (stock = sl->begin(); stock != sl->end(); stock++) {
+        map<int,double> actualList = (*(prevDayDiffActual.find(stock->second.getName())->second));
+        double actualChange = actualList[stock->second.convertDate(predictDate)];
+        if (results[h] > 0) {
+            cout << "Actual Change: " << actualChange << endl;
+            cout << "Profit for stock " << stock->second.getName() << " with " << results[h] << " invested: "
+                 << results[h] * actualChange << endl;
+            cout << endl;
+        }
+        profit = profit + results[h] * actualChange ;
+        h++;
+    }
+
+    cout << "Total Profit: " << profit << endl;
+}
 void Backtest::calcPrevDayChange() {
     cout << "Calc Prev Day Change" << endl;
     map<string, Stock>::iterator st;
     vector<tm *>::iterator date;
-
 
     //Loop through all stocks
     for (st = sl->begin(); st != sl->end(); st++) {
         date = dates->begin() + startDate;
 
         //Loop through each date within the stock
-        for (int i = 0; i < numDays; i++) {
+        for (int i = 0; i < numDays + 1; i++) {
             //Gets map corresponding to each stock name from lists
             map<int,double> predList = (*(predicted.find(st->second.getName())->second));
             map<int,double> actualList = (*(actuals.find(st->second.getName())->second));
@@ -171,23 +203,26 @@ void Backtest::calcPercentCorrect() {
         date = dates->begin() + startDate;
 
         //Loop through each date within the stock
-        for (int i = 0; i < numDays; i++) {
+        //CHANGE BACK LATER
+        for (int i = 0; i < numDays + 1; i++) {
             //Gets map corresponding to each stock name from lists
             map<int,double> predList = (*(prevDayDiffPred.find(stock->second.getName())->second));
             map<int,double> actualList = (*(prevDayDiffActual.find(stock->second.getName())->second));
 
             //Increments correct if predicted and actual diff is in same direction (Incrememnts total every time)
             if (predList[stock->second.convertDate(*date)] > 0.0 && actualList[stock->second.convertDate(*date)] > 0.0) {
+
                 correct++;
             } else if (predList[stock->second.convertDate(*date)] < 0.0 && actualList[stock->second.convertDate(*date)] < 0.0) {
                 correct++;
             }
+            cout << "Actual: " << actualList[stock->second.convertDate(*date)] << " For date: " << stock->second.convertDate(*date) << endl;
 
             total++;
             date++;
 
         }
-        cout << "Here" << endl;
+
         //Calculates percent and saves it for later use
         double percent = (float)correct/total;
         percentCorrect->insert(pair<string, double>(stock->second.getName(), percent));
@@ -218,6 +253,6 @@ int Backtest::getDateIndx(tm *Date) {
         }
     }
 
-    //If the date doesn't exist
-    return -1;
+    //If the date doesn't exist assumes to be next day
+    return dates->size();
 }

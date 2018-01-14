@@ -115,17 +115,31 @@ int managerPrompt() {
     if (option == 'f') {
 		//Testing only
         int interval = 30;
-        int numDays = 10;
+        int numDays = 20;
 		tm *predictDate = new tm();
-		predictDate->tm_mday = 28;
-		predictDate->tm_mon = 6;
-		predictDate->tm_year = 17;
+		/*
+		//This is for the Small stockdate
+		 predictDate->tm_mday = 21;
+		 predictDate->tm_mon = 9;
+		 predictDate->tm_year = 17;
 
         //Prompt user for possible factors to include
         vector <string> *factorNames = new vector<string>();
         factorNames->push_back("LowPrice");
         factorNames->push_back("HighPrice");
-        factorNames->push_back("Volume");
+        factorNames->push_back("Volatility");
+	*/
+
+
+		predictDate->tm_mday = 20;
+		predictDate->tm_mon = 6;
+		predictDate->tm_year = 17;
+
+		//Prompt user for possible factors to include
+		vector <string> *factorNames = new vector<string>();
+		factorNames->push_back("LowPrice");
+		factorNames->push_back("HighPrice");
+		factorNames->push_back("Volume");
 
 		//Creates new backtest and runs it
         Backtest *bt = new Backtest(fund, interval, factorNames, numDays, predictDate);

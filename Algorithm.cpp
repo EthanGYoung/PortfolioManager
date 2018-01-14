@@ -177,7 +177,7 @@ int Algorithm::getDateIndex(tm *Date, Stock *st, Fund *fund) {
     }
 
     //If the date doesn't exist
-    return -1;
+    return dates->size();;
 }
 
 double Algorithm::getPrediction(double result[], vector<string> *faName, Stock *stk, int index, vector<tm *> *dates) {
@@ -241,22 +241,23 @@ double Algorithm::getPrediction(double result[], vector<string> *faName, Stock *
 
 //Vars: 2*numSt + 1
 //Constraints: 3*numSt + 3
-void Algorithm::selectStockDistribution(tm *Date, map<string, double> *percentCorrect, map<string, double> *increase) {
+double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, map<string, double> *increase) {
+    //Initialize in algorithm when ready
     int totalBudget = 1000;
-    int numDiffPurchased = 10;
+    int numDiffPurchased = 15;
     double upperPercentLimit = .25;
     double lowerPercentLimit = .05;
 
 
     cout << "selectStockDistribution in algorithm" << endl;
 
-    glp_prob *mip; //LP instance
+    glp_prob *mip; //MIP instance
 
-    //Size of the arrays is number vars (s*tocks + 1) * each constraint (3*stocks + 3) + 1 because start at index 1
+    //Size of the arrays is number vars (#stocks + 1) * each constraint (3*stocks + 3) + 1 because start at index 1
     int size = (2 * (int) stockList->size() + 1) * (3 * (int) stockList->size() + 2) + 1;
 
 
-    //ia is constraint index, ja is variable index, ar is coeff for everything
+    //ia is constraint index, ja is variable index, ar is coeff for everything (Made pointers because stack overflow)
     int *ia = new int[size];
     int *ja = new int[size];
     double *ar = new double[size];
@@ -279,10 +280,12 @@ void Algorithm::selectStockDistribution(tm *Date, map<string, double> *percentCo
     map<string, Stock>::iterator stock;
     map<string, double>::iterator inc;
 
+    cout << "Printing increase" << endl;
 
     int i = 1;
 
-    //Sets less than 0 for all stock constraints
+    //Sets less than 0 for all stock constraints for eq1
+    //eq1(i)..        a(i) * Y(i) * b * L - X(i) =L= 0;                 numSt eqs            //Lower bound on stocks bought
     for (stock = stockList->begin(); stock != stockList->end(); stock++) {
         glp_set_row_bnds(mip, i, GLP_UP, 0, 0);
         i++;
@@ -293,8 +296,8 @@ void Algorithm::selectStockDistribution(tm *Date, map<string, double> *percentCo
         glp_set_row_bnds(mip, i, GLP_LO, 0, 0);
         i++;
     }
-    //eq3..           sum(i, Y(i)) - N * Z=G= 0;                       1 eq            //Have to purchase more than N stocks
-    glp_set_row_bnds(mip, i, GLP_LO, 0, 0);
+    //eq3..           sum(i, Y(i))=G= N;                       1 eq            //Have to purchase more than N stocks
+    glp_set_row_bnds(mip, i, GLP_LO, numDiffPurchased, numDiffPurchased);
     i++;
     //eq4..           sum(i, a(i)) - (S - N + 1) * Z - (N - 1) =L= 0;     1 eq            //Detect if less than N stocks can be bought
     //ADD LATER IF NEEDED JUST AN INDICATOR
@@ -304,10 +307,10 @@ void Algorithm::selectStockDistribution(tm *Date, map<string, double> *percentCo
     glp_set_row_bnds(mip, i, GLP_UP, totalBudget, totalBudget);
     i++;
 
-    inc = increase->begin();
     //eq7(i)..        Y(i) - a(i) =L= 0;                                NumSt eqs            //Can't buy a stock if it isn't supposed to increase
     for (stock = stockList->begin(); stock != stockList->end(); stock++) {
-        glp_set_row_bnds(mip, i, GLP_UP, inc->second, inc->second);
+        glp_set_row_bnds(mip, i, GLP_UP, (increase->find(stock->second.getName())->second),
+                         (increase->find(stock->second.getName())->second));
         i++;
     }
 
@@ -316,117 +319,115 @@ void Algorithm::selectStockDistribution(tm *Date, map<string, double> *percentCo
     //Creates the variables (2*numSt + 1)
     glp_add_cols(mip, numVars);
 
+    int m = 1;
+
+    for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+        //Sets the X(i) as nonneg and have obj coeff of their percentages
+        glp_set_col_bnds(mip, m, GLP_LO, 0, 0);
+        glp_set_obj_coef(mip, m, percentCorrect->find(stock->second.getName())->second);
+
+        //Sets the Y(i) as binary and less than the increase passed in
+        glp_set_col_bnds(mip, m + (int) stockList->size(), GLP_DB, 0,
+                         (increase->find(stock->second.getName())->second));
+        glp_set_col_kind(mip, m + (int) stockList->size(), GLP_BV);
+
+        m++;
+    }
+    // For when you add the Z
+    // glp_set_col_bnds(mip, var + m - 3, GLP_LO, 0 , 0);
+
 
     int j = 1; //Array index
     i = 1; //constraint index
-    int k = 1;
-    int varNum = 1;
-    inc = increase->begin();
 
-    //TODO: Fix the increase iterator
     //eq1(i)..        a(i) * Y(i) * b * L - X(i) =L= 0;  numSt eqs            //Lower bound on stocks bought
-    //Handles X(i)
-    for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+    for (int t = 1; t < numVars + 1; t++) {
         //Loops through the variables
-        for (int t = 1; t < numVars + 1; t++) {
-
-            //Does X(i)
+        i = 1;
+        for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+            //First if: X(i), second if: Y(i), third if: both when they need to be 0 for constraint
             if (i == t && t < (int) stockList->size() + 1) {
-                cout << "Var Num1: " << varNum << endl;
                 ia[j] = i; //Loops through constraints
                 ja[j] = t; //Loops through variables
                 ar[j] = -1; //sets all stocks to -1
                 j++;
-            } else if (i == t) {
-                cout << "Var Num2: " << varNum << endl;
+            } else if (i + (int) stockList->size() == t) {
                 ia[j] = i; //Loops through constraints
                 ja[j] = t; //Loops through variables
-                ar[j] = totalBudget * lowerPercentLimit * inc->second;
+                ar[j] = totalBudget * lowerPercentLimit;
                 j++;
-                inc++;
             } else {
-                cout << "Var Num3: " << varNum << endl;
                 ia[j] = i; //Loops through constraints
                 ja[j] = t; //Loops through variables
                 ar[j] = 0; //sets all stocks to 0 if not in the equation
                 j++;
             }
             //Goes to next var
-
-            cout << "Var Num: " << varNum << endl;
-            cout << "TOT " << numVars << endl;
-            varNum++;
+            i++;
         }
-cout << size << endl;
-        //Goes to next constraint (Next stock)
-        i++;
     }
 
-    varNum = 1;
-    inc = increase->begin();
+    int end = i;
+
     //eq2(i)..        a(i) * Y(i) * b * U - X(i)=G= 0;                 numSt eqs            //Upper bound on stocks bought
-    //Handles X(i)
-    for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+    for (int t = 1; t < numVars + 1; t++) {
         //Loops through the variables
-        for (int t = 1; t < numVars + 1; t++) {
-            //Does X(i)
-            if (i == t && t < (int) stockList->size() + 1) {
+        i = end;
+        //Loops through the variables
+        for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+            //Fist if: X(i), second if: Y(i), third if: both when they need to be 0 for constraint
+            if (i - (int) stockList->size() == t && t < (int) stockList->size() + 1) {
                 ia[j] = i; //Loops through constraints
-                ja[j] = varNum; //Loops through variables
+                ja[j] = t; //Loops through variables
                 ar[j] = -1; //sets all stocks to -1
                 j++;
             } else if (i == t) {
+                //Initializing Y
                 ia[j] = i; //Loops through constraints
-                ja[j] = varNum; //Loops through variables
-                ar[j] = totalBudget * upperPercentLimit * inc->second;
+                ja[j] = t; //Loops through variables
+                ar[j] = totalBudget * upperPercentLimit;
                 j++;
-                inc++;
             } else {
                 ia[j] = i; //Loops through constraints
                 ja[j] = t; //Loops through variables
                 ar[j] = 0; //sets all stocks to 0 if not in the equation
                 j++;
             }
-            //Goes to next var
-            varNum++;
+            //Goes to next constraint
+            i++;
 
         }
-        //Goes to next constraint
-        i++;
     }
 
     //eq3..           sum(i, Y(i)) - N * Z=G= 0;                       1 eq            //Have to purchase more than N stocks
-    varNum = 1;
-        for (int t = 1; t < numVars + 1; t++) {
-            //Does X(i)
-            if (t > (int) stockList->size() && t != numVars) {
-                //This is the sum part
-                ia[j] = i; //Loops through constraints
-                ja[j] = varNum; //Loops through variables
-                ar[j] = 1; //sets all stocks to 1
-                j++;
-            } else if (t == numVars) {
-                //This is the Z term
-                ia[j] = i; //Loops through constraints
-                ja[j] = varNum; //Loops through variables
-                ar[j] = -numDiffPurchased;
-                j++;
-            } else {
-                ia[j] = i; //Loops through constraints
-                ja[j] = t; //Loops through variables
-                ar[j] = 0; //sets all stocks to 0 if not in the equation
-                j++;
-            }
-            //Goes to next var
-            varNum++;
-
+    //NO Z FOR NOW UNTIL ADDED
+    for (int t = 1; t < numVars + 1; t++) {
+        //First if: Y(i), second if: Z WHEN ADDED, third if: The rest
+        if (t > (int) stockList->size() && t != numVars) {
+            //This is the sum part
+            ia[j] = i; //Loops through constraints
+            ja[j] = t; //Loops through variables
+            ar[j] = 1; //sets all stocks to 1
+            j++;
+        } else if (t == numVars) {
+            //This is the Z term
+            ia[j] = i; //Loops through constraints
+            ja[j] = t; //Loops through variables
+            //ar[j] = -numDiffPurchased;
+            ar[j] = 0;
+            j++;
+        } else {
+            ia[j] = i; //Loops through constraints
+            ja[j] = t; //Loops through variables
+            ar[j] = 0; //sets all stocks to 0 if not in the equation
+            j++;
         }
-        i++;
+    }
+    i++;
 
     //eq5..           sum(i, X(i)) - b =L= 0;                           1 eq            //Upper bound on amount purchased
-    varNum = 1;
     for (int t = 1; t < numVars + 1; t++) {
-        //Does X(i)
+        //Does X(i) part
         if (t < (int) stockList->size() + 1) {
             //This is the sum part
             ia[j] = i; //Loops through constraints
@@ -443,16 +444,16 @@ cout << size << endl;
     }
     i++;
 
-    varNum = 1;
-    inc = increase->begin();
+    int varNum = 1 + (int) stockList->size();
+
     //eq7(i)..        Y(i) - a(i) =L= 0;
     for (stock = stockList->begin(); stock != stockList->end(); stock++) {
         //Loops through the variables
         for (int t = 1; t < numVars + 1; t++) {
-            //Does X(i)
-            if (varNum == t && t > (int) stockList->size() + 1) {
+            //Does Y(i) part
+            if (varNum == t && t > (int) stockList->size() && t != numVars) {
                 ia[j] = i; //Loops through constraints
-                ja[j] = varNum; //Loops through variables
+                ja[j] = t; //Loops through variables
                 ar[j] = 1; //sets all stocks to -1
                 j++;
             } else {
@@ -461,42 +462,71 @@ cout << size << endl;
                 ar[j] = 0; //sets all stocks to 0 if not in the equation
                 j++;
             }
-            //Goes to next var
-            varNum++;
-
         }
         //Goes to next constraint
+        varNum++;
         i++;
     }
 
+    //Printing out stuff
+
+    //cout << 3 * (int) stockList->size() + 2 << endl;
     //Prints out matrix for testing
     //cout << "Stock: " << st->getName() << " Passed in Date: " << st->convertDate(Date) << endl;
     //for (int k = 1; k < size; k++) {
     //   cout << "k = " << k << " IA = " << ia[k] << " JA = " << ja[k] << " AR = " << ar[k] << endl;
+//    }
+    //for (int r = 1; r < 9; r++) {
+    // cout << "Row " << r << " lb: " << glp_get_row_lb(mip,r) << endl;
+    //cout << "Row " << r << " ub: " << glp_get_row_ub(mip,r) << endl;
     //}
+    /*
+    for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+        cout << "Increase for stock " << stock->second.getName() << ": " << increase->find(stock->second.getName())->second << endl;
+    }
+
+    cout << "Printing percent" << endl;
+    for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+        cout << "Percent for stock " << stock->second.getName() << ": " << percentCorrect->find(stock->second.getName())->second << endl;
+    }
+     */
 
     //Load matrix into program
     glp_load_matrix(mip, size - 1, ia, ja, ar);
 
-    glp_intopt(mip, NULL);
+    //Initializes and calls the mixed integer solver
+    glp_iocp parm;
+    glp_init_iocp(&parm);
+    parm.presolve = GLP_ON;
+    glp_intopt(mip, &parm);
 
-    z = glp_get_obj_val(mip);
+    z = glp_mip_obj_val(mip);
 
+    //Prints out results
     printf("\nz: %f\n", z);
-
-    for (int h = 1; h < (int) faName->size() + 1; h++) {
-        cout << "Var" << h << ": " << glp_get_col_prim(mip, h) << " ";
-        //results[h] = glp_get_col_prim(mip, h);
+    int h = 1;
+    for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+        if (glp_mip_col_val(mip, h) > 0) {
+            cout << "X(" << stock->second.getName() << "): " << glp_mip_col_val(mip, h) << endl;
+        }
+        results[h] = glp_mip_col_val(mip, h);
+        h++;
     }
     cout << endl;
-    for (int h = (int) faName->size() + 1; h < (int) faName->size() + 2 * testInterval + 1; h++) {
-        cout << "Error" << h << ": " << glp_get_col_prim(mip, h) << " ";
-        //results[h] = glp_get_col_prim(mip, h);
+    for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+        if (glp_mip_col_val(mip, h) > 0) {
+            cout << "Y(" << stock->second.getName() << "): " << glp_mip_col_val(mip, h) << endl;
+        }
+        //results[h] = glp_mip_col_val(mip, h);
+        h++;
     }
+    cout << "Z: " << glp_mip_col_val(mip, h) << endl;
 
     glp_delete_prob(mip);
 
     cout << "END selectStockDistribution in algorithm" << endl;
+
+    return results;
 
 
 }

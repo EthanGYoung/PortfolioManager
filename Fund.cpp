@@ -108,26 +108,11 @@ bool Fund::checkCredentials(string username, string password) {
 
 void Fund::setDateList(vector<tm*> *dl) {
     cout << "Setting Date List in Fund" << endl;
-    /*cout << "Fund->getDateList(): " << dl->operator[](0)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dl->operator[](1)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dl->operator[](2)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dl->operator[](3)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dl->operator[](4)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dl->operator[](5)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dl->operator[](6)->tm_mon << endl;*/
     dateList = dl;
 
 }
 
 std::vector<tm*>* Fund::getDateList() {
     cout << "Getting Date List in Fund" << endl;
-	/*cout << "Fund->getDateList(): " << dateList->operator[](0)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dateList->operator[](1)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dateList->operator[](2)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dateList->operator[](3)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dateList->operator[](4)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dateList->operator[](5)->tm_mon << endl;
-    cout << "Fund->getDateList(): " << dateList->operator[](6)->tm_mon << endl;*/
-
     return dateList;
 }
