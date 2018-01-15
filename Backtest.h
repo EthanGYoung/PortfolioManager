@@ -34,11 +34,12 @@ public:
     tm *predictDate;
     Algorithm *al;
     Fund *fund;
-    void btResults(double* results);
-    Backtest(Fund *fundEx, int interva, vector<string> *factors, int numDay, tm *predictedDate);
+    int dayUnknown;
+    double btResults(double* results);
+    Backtest(Fund *fundEx, int interva, vector<string> *factors, int numDay, tm *predictedDate, bool unknown);
     virtual ~Backtest();
     void runBacktestStocks();
-    void userBacktestMain();
+    double userBacktestMain();
     void calcPrevDayChange();
     void calcPercentCorrect();
     void predictDay();

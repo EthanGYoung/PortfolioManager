@@ -154,7 +154,7 @@ double Algorithm::predictDate(tm *Date, Stock *st) {
     }
 
     glp_delete_prob(lp);
-
+    cout << endl;
     return getPrediction(results, faName, st, getDateIndex(Date, st, fund), dates);
 
 }
@@ -185,13 +185,11 @@ double Algorithm::getPrediction(double result[], vector<string> *faName, Stock *
     vector<tm *>::iterator date;
     date = dates->begin() + index;
 
-    //cout << "Getting Prediction for date: " << stk->convertDate(*it) << endl;
-    //cout << "Using dates from: " << stk->convertDate(*(it - 1)) << endl;
-
     //Loops through each variable and calculates with prediction date data
     for (int i = 1; i < (int) faName->size() + 1; i++) {
         prediction = prediction + stk->getFactorValue(faName->operator[](i - 1), *(date - 1)) * result[i];
     }
+
 
     return prediction;
 }
