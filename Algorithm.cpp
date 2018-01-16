@@ -6,11 +6,15 @@
 #include <glpk.h>
 #include <iostream>
 
-Algorithm::Algorithm(int interval, Fund *fundEx, vector<string> *factorNames) {
+Algorithm::Algorithm(int interval, Fund *fundEx, vector<string> *factorNames, int budget, int numPur, double upperLim, double lowerLim) {
     testInterval = interval;
     fund = fundEx;
     faName = factorNames;
     stockList = fund->getStockList();
+    totalBudget = budget;
+    numDiffPurchased = numPur;
+    upperPercentLimit = upperLim;
+    lowerPercentLimit = lowerLim;
 }
 
 Algorithm::~Algorithm() {
@@ -67,7 +71,7 @@ double Algorithm::predictDate(tm *Date, Stock *st) {
     //Gets actuals for the bounds and goes backwards to the correct date
     cout << "Predicting Date: " << st->convertDate(Date) << endl;
     for (it = dates->begin() + indexVal; i < testInterval + 1; it++) {
-        double actual = st->getFactorValue("OpenPrice", *it);
+        double actual = st->getFactorValue("close", *it);
 
         //Equality constraint
         glp_set_row_bnds(lp, i, GLP_FX, actual, actual);
@@ -92,7 +96,7 @@ double Algorithm::predictDate(tm *Date, Stock *st) {
 
     int j = 1;
     int varNum = 0;
-
+    cout << "Here";
     //Loop through variables that are factors
     for (itr = faName->begin(); itr != faName->end(); itr++) {
         i = 1;
@@ -107,6 +111,7 @@ double Algorithm::predictDate(tm *Date, Stock *st) {
             i++;
         }
     }
+
 
     //Creates positive and negative error term for each constraint
     for (int n = 1; n < testInterval + 1; n++) {
@@ -155,6 +160,7 @@ double Algorithm::predictDate(tm *Date, Stock *st) {
 
     glp_delete_prob(lp);
     cout << endl;
+
     return getPrediction(results, faName, st, getDateIndex(Date, st, fund), dates);
 
 }
@@ -240,12 +246,6 @@ double Algorithm::getPrediction(double result[], vector<string> *faName, Stock *
 //Vars: 2*numSt + 1
 //Constraints: 3*numSt + 3
 double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, map<string, double> *increase) {
-    //Initialize in algorithm when ready
-    int totalBudget = 1000;
-    int numDiffPurchased = 15;
-    double upperPercentLimit = .25;
-    double lowerPercentLimit = .05;
-
 
     cout << "selectStockDistribution in algorithm" << endl;
 
@@ -277,8 +277,6 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
     //eq1(i)..        a(i) * Y(i) * b * L - X(i) =L= 0;  numSt eqs            //Lower bound on stocks bought
     map<string, Stock>::iterator stock;
     map<string, double>::iterator inc;
-
-    cout << "Printing increase" << endl;
 
     int i = 1;
 
@@ -489,6 +487,10 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
     }
      */
 
+    cout << totalBudget << endl;
+    cout << numDiffPurchased << endl;
+    cout << upperPercentLimit << endl;
+    cout << lowerPercentLimit << endl;
     //Load matrix into program
     glp_load_matrix(mip, size - 1, ia, ja, ar);
 

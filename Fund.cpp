@@ -31,7 +31,6 @@ Fund::~Fund() {
 }
 
 void Fund::addStock(Stock stock) {
-    //cout << "Adding stock: "<< stock.getName() << " to fund" << endl;
 	stockList->insert(pair<string,Stock>(stock.getName(),stock));
 
 }
@@ -41,7 +40,6 @@ void Fund::addInvestor(Investor investor) {
 }
 
 bool Fund::stockExists(Stock stock) {
-   //cout << "Checking if stock exists in fund" << endl;
 	map<string, Stock>::iterator it;
 
 	for ( it = stockList->begin(); it != stockList->end(); it++ )
@@ -56,7 +54,6 @@ bool Fund::stockExists(Stock stock) {
 }
 
 Stock* Fund::getStock(std::string stockName) {
-    //cout << "Getting stock in fund" << endl;
     map<string, Stock>::iterator it;
 
     for ( it = stockList->begin(); it != stockList->end(); it++ )
@@ -69,7 +66,6 @@ Stock* Fund::getStock(std::string stockName) {
 }
 
 map<std::string, Stock>* Fund::getStockList() {
-    cout << "Getting Stock List from fund" << endl;
     return stockList;
 }
 
@@ -107,12 +103,10 @@ bool Fund::checkCredentials(string username, string password) {
 }
 
 void Fund::setDateList(vector<tm*> *dl) {
-    cout << "Setting Date List in Fund" << endl;
     dateList = dl;
 
 }
 
 std::vector<tm*>* Fund::getDateList() {
-    cout << "Getting Date List in Fund" << endl;
     return dateList;
 }

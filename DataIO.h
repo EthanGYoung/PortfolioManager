@@ -24,6 +24,7 @@ public:
 	DataIO();
 	DataIO(string stockFilename, string investorFilename, string fundFilename);
 
+	void writeDistributionToFile();
 	void initializeStocksLocal();
 	void initializeInvestorLocal();
 	void initializeAllInvestorsLocal();
@@ -32,7 +33,6 @@ public:
 	vector<tm*>* getDates(string filename, char delim);
 	//Importing the data from computer
     Fund * initializeFundLocal();
-
 	//Exporting the Data
 	void exportFundLocal();
 	virtual ~DataIO();

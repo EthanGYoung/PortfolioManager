@@ -36,7 +36,7 @@ public:
     Fund *fund;
     int dayUnknown;
     double btResults(double* results);
-    Backtest(Fund *fundEx, int interva, vector<string> *factors, int numDay, tm *predictedDate, bool unknown);
+    Backtest(Fund *fundEx, int interva, vector<string> *factors, int numDay, tm *predictedDate, bool unknown, int budget, int numPur, double upperLim, double lowerLim);
     virtual ~Backtest();
     void runBacktestStocks();
     double userBacktestMain();

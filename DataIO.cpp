@@ -106,7 +106,8 @@ void DataIO::initializeStocksLocal() {
 		//Sets the value for factor at specified date for stock
 		for (int i = 0; i < (int)dateInfo->size(); i++) {
 			//Gets the next price
-			getline(ss, item, fileDelimDefault);
+			getline(ss, item, fileDelimDefault);\
+			//cout << item << endl;
 			currStock->setFactorValue(currFactor.getName(),
 					dateInfo->operator[](i), stof(item));
 		}
@@ -116,6 +117,10 @@ void DataIO::initializeStocksLocal() {
 	input.close();
 }
 
+
+void DataIO::writeDistributionToFile() {
+
+}
 //Initializes all investors
 void DataIO::initializeAllInvestorsLocal() {
 	cout << "Initializing Investors" << endl;
@@ -235,6 +240,7 @@ vector<tm*>* DataIO::getDates(string filename, char delim) {
 			tm *date = new tm();
 
 			stringstream ss(line);
+
 			//Split at the / to get the date
 			if (getline(ss, line, '/')) {
 				date->tm_mon = stoi(line) - 1;
@@ -250,6 +256,7 @@ vector<tm*>* DataIO::getDates(string filename, char delim) {
 
 			//Adds date to list
 			dates->push_back(date);
+
 		}
 
 	}

@@ -133,22 +133,23 @@ int managerPrompt() {
 		vector<tm*> *dates = fund->getDateList();
 		vector<tm*>::iterator date;
 		map<int, double> *profits = new map<int, double>();
-		predictDate->tm_mday = 28;
-		predictDate->tm_mon = 6;
-		predictDate->tm_year = 17;
+		predictDate->tm_mday = 12;
+		predictDate->tm_mon = 0;
+		predictDate->tm_year = 18;
 		Stock st("Hey:");
 		//Prompt user for possible factors to include
 		vector <string> *factorNames = new vector<string>();
-		factorNames->push_back("LowPrice");
-		factorNames->push_back("HighPrice");
+		factorNames->push_back("low");
+		factorNames->push_back("high");
 		factorNames->push_back("Volume");
-		bool unknown = false;
+		bool unknown = true;
+		Backtest *bt = new Backtest(fund, interval, factorNames, numDays, predictDate, unknown, 1000, 15, .25, .05);
+		double profit = bt->userBacktestMain();
+		/*int i = 0;
+		for (date = dates->end() - 50; i < 15; date++) {
 
-		int i = 0;
-		for (date = dates->begin() + 300; i < 50; date++) {
-
-			//Creates new backtest and runs it
-			Backtest *bt = new Backtest(fund, interval, factorNames, numDays, *date, unknown);
+			//Creates new backtest and runs itFund *fundEx, int interva, vector<string> *factors, int numDay, tm *predictedDate, bool unknown, int budget, int numPur, double upperLim, double lowerLim
+			Backtest *bt = new Backtest(fund, interval, factorNames, numDays, *date, unknown, 1000, 15, .25, .5);
 			double profit = bt->userBacktestMain();
 			cout << "Profit profit: " << profit << endl;
 			profits->insert(pair<int, double>(st.convertDate(*date), profit));
@@ -163,7 +164,7 @@ int managerPrompt() {
             total++;
 		}
 
-        cout << "Average: " << avg/total << endl;
+        cout << "Average: " << avg/total << endl;*/
     }
 
 

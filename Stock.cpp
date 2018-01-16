@@ -6,13 +6,8 @@
  */
 
 #include "Stock.h"
-#include "Factor.h"
 #include <iostream>
-#include <exception>
-#include <vector>
-#include <map>
-#include <ctime>
-#include <string>
+
 
 using namespace std;
 
@@ -34,7 +29,6 @@ bool Stock::buy() {
 }
 
 // Sells the stock
-//We trying
 bool Stock::sell() {
 	cout << "Implement sell stock." << endl;
 	return true;
@@ -63,51 +57,4 @@ string Stock::getName() {
 	return name;
 }
 
-void Stock::addPred(string algoName, double value, int date) {
-    //cout << "addPred" << endl;
-	map<int, double>* list = new map<int, double>();
-    map<std::string, std::map<int,double>*>::iterator it;
-    bool found = false;
-
-    for (it = predAlgorithms.begin(); it != predAlgorithms.end(); it++) {
-        if (it->first == algoName) {
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        predAlgorithms.insert(pair<string, map<int, double>*>(algoName, list));
-    }
-
-	//Adds prediction at specified date
-	predAlgorithms.find(algoName)->second->insert(pair<int, double>(date, value));
-
-	cout << "addPred is adding for stock: " << this->getName() << " date: " << date << " val: " << value << endl;
-
-}
-
-void Stock::addActualDiff(string algoName, double actual, double predicted, int date) {
-    //cout << "addPred" << endl;
-    map<int, double>* list = new map<int, double>();
-    map<std::string, std::map<int,double>*>::iterator it;
-    bool found = false;
-
-    for (it = resultsAlgo.begin(); it != resultsAlgo.end(); it++) {
-        if (it->first == algoName) {
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        resultsAlgo.insert(pair<string, map<int, double>*>(algoName, list));
-    }
-
-
-    //Adds prediction at specified date
-    resultsAlgo.find(algoName)->second->insert(pair<int, double>(date, actual - predicted));
-
-    cout << "addActualDiff is adding for stock: " << this->getName() << " date: " << date << " val: " << actual << endl;
-}
 

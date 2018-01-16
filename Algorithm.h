@@ -10,7 +10,7 @@
 
 class Algorithm {
 public:
-    Algorithm(int interval, Fund *fund, vector<string> *factorNames);
+    Algorithm(int interval, Fund *fund, vector<string> *factorNames, int budget, int numPur, double upperLim, double lowerLim);
     virtual ~Algorithm();
     double predictDate(tm *Date, Stock *st);
     double* selectStockDistribution(map<string, double> *percentCorrect, map<string, double> *increase);
@@ -21,6 +21,11 @@ private:
     Fund *fund;
     vector<string> *faName;
     std::map<string, Stock> *stockList;
+    //Initialize in algorithm when ready
+    int totalBudget;
+    int numDiffPurchased;
+    double upperPercentLimit;
+    double lowerPercentLimit;
 };
 
 
