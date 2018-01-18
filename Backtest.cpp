@@ -4,6 +4,7 @@
 
 #include "Backtest.h"
 #include <iostream>
+#include "DataIO.h"
 #include "Stock.h"
 
 using namespace std;
@@ -144,8 +145,12 @@ double Backtest::userBacktestMain() {
     for (itr = percentCorrect->begin(); itr != percentCorrect->end(); itr++) {
         cout << "Stock(" << itr->first << "): " << itr->second << endl;
     }
+    vector<tm *>::iterator dt;
+    dt = dates->begin() + getDateIndx(predictDate) - 1;
+    double *results = al->selectStockDistribution(percentCorrect, increase, *dt);
 
-    double *results = al->selectStockDistribution(percentCorrect, increase);
+    DataIO *out = new DataIO("Not Needed", "Not Needed", "Not Needed");
+    out->writeDistributionToFile(*(dt), results, sl);
 
     //Only runs btResults if day results known
     if (dayUnknown == 1) {
@@ -179,7 +184,8 @@ double Backtest::btResults(double *results) {
 
         //Calculates the percent change in the stock
         double actualChange =
-                prevActualList[stock->second.convertDate(*date)] / actualList[stock->second.convertDate(*(date - 1))];
+                prevActualList[stock->second.convertDate(*date)];
+        // actualList[stock->second.convertDate(*(date - 1))];
 
         //Profit determined by percent increase * investment
         profit = profit + results[h] * actualChange;

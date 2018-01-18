@@ -24,7 +24,7 @@ public:
 	DataIO();
 	DataIO(string stockFilename, string investorFilename, string fundFilename);
 
-	void writeDistributionToFile();
+	void writeDistributionToFile(tm *Date, double *results, std::map<string, Stock> *sl);
 	void initializeStocksLocal();
 	void initializeInvestorLocal();
 	void initializeAllInvestorsLocal();

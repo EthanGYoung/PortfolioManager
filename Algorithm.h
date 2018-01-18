@@ -13,7 +13,7 @@ public:
     Algorithm(int interval, Fund *fund, vector<string> *factorNames, int budget, int numPur, double upperLim, double lowerLim);
     virtual ~Algorithm();
     double predictDate(tm *Date, Stock *st);
-    double* selectStockDistribution(map<string, double> *percentCorrect, map<string, double> *increase);
+    double* selectStockDistribution(map<string, double> *percentCorrect, map<string, double> *increase, tm *date);
 private:
     int getDateIndex(tm* Date, Stock *st, Fund *fund);
     double getPrediction(double result[], vector<string> *faName, Stock *stk, int date, vector<tm*> *dates);

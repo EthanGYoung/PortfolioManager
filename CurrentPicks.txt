@@ -1,0 +1,11 @@
+Date after: 1172018
+Stock: BBY Amount: 1
+Stock: BLL Amount: 1
+Stock: CHRW Amount: 1
+Stock: DGX Amount: 1
+Stock: HD Amount: 1
+Stock: HP Amount: 1
+Stock: LOW Amount: 1
+Stock: MRO Amount: 1.34264
+Stock: NWL Amount: 4.54528
+Stock: UPS Amount: 1

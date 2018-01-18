@@ -36,7 +36,7 @@ bool Stock::sell() {
 
 //Converts date to an int for indexing the maps
 int Stock::convertDate(tm* Date) {
-	return Date->tm_mon *1000000 + Date->tm_mday*10000 + Date->tm_year + 2000;
+	return (Date->tm_mon + 1) *1000000 + Date->tm_mday*10000 + Date->tm_year;
 }
 
 

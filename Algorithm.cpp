@@ -245,7 +245,7 @@ double Algorithm::getPrediction(double result[], vector<string> *faName, Stock *
 
 //Vars: 2*numSt + 1
 //Constraints: 3*numSt + 3
-double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, map<string, double> *increase) {
+double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, map<string, double> *increase, tm *prevDate) {
 
     cout << "selectStockDistribution in algorithm" << endl;
 
@@ -321,6 +321,7 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
         //Sets the X(i) as nonneg and have obj coeff of their percentages
         glp_set_col_bnds(mip, m, GLP_LO, 0, 0);
         glp_set_obj_coef(mip, m, percentCorrect->find(stock->second.getName())->second);
+        //glp_set_col_kind(mip, m, GLP_IV);
 
         //Sets the Y(i) as binary and less than the increase passed in
         glp_set_col_bnds(mip, m + (int) stockList->size(), GLP_DB, 0,
@@ -336,21 +337,27 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
     int j = 1; //Array index
     i = 1; //constraint index
 
-    //eq1(i)..        a(i) * Y(i) * b * L - X(i) =L= 0;  numSt eqs            //Lower bound on stocks bought
+    //eq1(i)..        a(i) * Y(i) * b * L - actual * X(i) =L= 0;  numSt eqs            //Lower bound on stocks bought
     for (int t = 1; t < numVars + 1; t++) {
         //Loops through the variables
         i = 1;
         for (stock = stockList->begin(); stock != stockList->end(); stock++) {
+
             //First if: X(i), second if: Y(i), third if: both when they need to be 0 for constraint
             if (i == t && t < (int) stockList->size() + 1) {
                 ia[j] = i; //Loops through constraints
                 ja[j] = t; //Loops through variables
-                ar[j] = -1; //sets all stocks to -1
+                ar[j] = -stock->second.getFactorValue("close",prevDate); //sets all stocks to multiply by prevDay close
                 j++;
             } else if (i + (int) stockList->size() == t) {
                 ia[j] = i; //Loops through constraints
                 ja[j] = t; //Loops through variables
-                ar[j] = totalBudget * lowerPercentLimit;
+                if (totalBudget * lowerPercentLimit > stock->second.getFactorValue("close",prevDate)) {
+                    ar[j] = totalBudget * lowerPercentLimit;
+                } else {
+                    ar[j] = stock->second.getFactorValue("close",prevDate);
+                }
+
                 j++;
             } else {
                 ia[j] = i; //Loops through constraints
@@ -365,7 +372,7 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
 
     int end = i;
 
-    //eq2(i)..        a(i) * Y(i) * b * U - X(i)=G= 0;                 numSt eqs            //Upper bound on stocks bought
+    //eq2(i)..        a(i) * Y(i) * b * U - actual * X(i)=G= 0;                 numSt eqs            //Upper bound on stocks bought
     for (int t = 1; t < numVars + 1; t++) {
         //Loops through the variables
         i = end;
@@ -375,7 +382,7 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
             if (i - (int) stockList->size() == t && t < (int) stockList->size() + 1) {
                 ia[j] = i; //Loops through constraints
                 ja[j] = t; //Loops through variables
-                ar[j] = -1; //sets all stocks to -1
+                ar[j] = -stock->second.getFactorValue("close",prevDate); //sets all stocks to -1
                 j++;
             } else if (i == t) {
                 //Initializing Y
@@ -421,15 +428,17 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
     }
     i++;
 
-    //eq5..           sum(i, X(i)) - b =L= 0;                           1 eq            //Upper bound on amount purchased
+    //eq5..           sum(i, actual * X(i)) - b =L= 0;                           1 eq            //Upper bound on amount purchased
     for (int t = 1; t < numVars + 1; t++) {
+        stock = stockList->begin();
         //Does X(i) part
         if (t < (int) stockList->size() + 1) {
             //This is the sum part
             ia[j] = i; //Loops through constraints
             ja[j] = t; //Loops through variables
-            ar[j] = 1; //sets all stocks to 1
+            ar[j] = stock->second.getFactorValue("close",prevDate); //sets all stocks to 1
             j++;
+            stock++;
         } else {
             ia[j] = i; //Loops through constraints
             ja[j] = t; //Loops through variables
@@ -498,6 +507,7 @@ double* Algorithm::selectStockDistribution(map<string, double> *percentCorrect, 
     glp_iocp parm;
     glp_init_iocp(&parm);
     parm.presolve = GLP_ON;
+    parm.tm_lim = 1000;
     glp_intopt(mip, &parm);
 
     z = glp_mip_obj_val(mip);

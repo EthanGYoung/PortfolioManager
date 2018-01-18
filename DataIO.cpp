@@ -108,8 +108,13 @@ void DataIO::initializeStocksLocal() {
 			//Gets the next price
 			getline(ss, item, fileDelimDefault);\
 			//cout << item << endl;
-			currStock->setFactorValue(currFactor.getName(),
-					dateInfo->operator[](i), stof(item));
+            try {
+                currStock->setFactorValue(currFactor.getName(),
+                                          dateInfo->operator[](i), stof(item));
+            } catch (std::invalid_argument e) {
+                cout << "Caught exception" << endl;
+            }
+
 		}
 
 	}
@@ -118,7 +123,24 @@ void DataIO::initializeStocksLocal() {
 }
 
 
-void DataIO::writeDistributionToFile() {
+void DataIO::writeDistributionToFile(tm *Date, double *results, std::map<string, Stock> *sl) {
+    ofstream myfile;
+    myfile.open("/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/CurrentPicks.txt");
+    Stock *test = new Stock("Hey");
+    //Write date
+    myfile << "Date after: " << test->convertDate(Date) << endl;
+
+    map<string, Stock>::iterator stock;
+    int h = 1;
+    for (stock = sl->begin(); stock != sl->end(); stock++) {
+        if (results[h] > 0) {
+            myfile << "Stock: " << stock->second.getName() << " Amount: " << results[h] << endl;
+			cout << "Here" << endl;
+        }
+        h++;
+    }
+
+	myfile.close();
 
 }
 //Initializes all investors
@@ -179,7 +201,12 @@ void DataIO::initializeAllInvestorsLocal() {
 
             //Gets value and adds to factor
             getline(ss, item, fileDelimDefault);
+			//cout << item << endl;
+            try {
             currInvestor->setFactorValue(factorNames->operator[](j), stof(item));
+        } catch (std::invalid_argument e) {
+            cout << "Caught exception" << endl;
+        }
         }
 
         //Adds initialized investor to fund

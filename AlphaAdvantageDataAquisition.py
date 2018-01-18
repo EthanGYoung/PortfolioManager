@@ -7,19 +7,17 @@ Created on Mon Jan 15 13:38:16 2018
 """
 
 from alpha_vantage.timeseries import TimeSeries
-import time
 import sys
-import random
 import csv
 import os
 
-
+#Got rid of ctxs, NWSA
 stocks = ['MMM','ABT','ABBV','ACN','ATVI','AYI','ADBE','AAP','AES','AET','AMG','AFL','A','APD','AKAM','ALK','ALB',
 'ALXN','ALLE','AGN','ADS','LNT','ALL','GOOGL','GOOG','MO','AMZN','AEE','AAL','AEP','AXP','AIG','AMT','AWK','AMP','ABC','AME',
 'AMGN','APH','APC','ADI','ANTM','AON','APA','AIV','AAPL','AMAT','ADM','ARNC','AJG','AIZ','T','ADSK','ADP','AN','AZO','AVB','AVY','BHI','BLL','BAC','BCR','BAX',
-'BBT','BDX','BBBY','BRK.B','BBY','BIIB','BLK','HRB','BA','BWA','BXP','BSX','BMY','AVGO','BF.B','CHRW','CA','COG',
+'BBT','BDX','BBBY','BRK.B','BBY','BIIB','BLK','HRB','BA','BWA','BXP','BSX','BMY','AVGO','CHRW','CA','COG',
 'CPB','COF','CAH','KMX','CCL','CAT','CBOE','CBG','CBS','CELG','CNC','CNP','CTL','CERN','CF','SCHW','CHTR','CHK','CVX','CMG','CB','CHD','CI','XEC',
-'CINF','CTAS','CSCO','C','CFG','CTXS','CME','CMS','COH','KO','CTSH','CL','CMCSA','CMA','CAG','CXO','COP','ED','STZ','GLW','COST',
+'CINF','CTAS','CSCO','C','CFG','CME','CMS','COH','KO','CTSH','CL','CMCSA','CMA','CAG','CXO','COP','ED','STZ','GLW','COST',
 'COTY','CCI','CSRA','CSX','CMI','CVS','DHI','DHR','DRI','DVA','DE','DLPH','DAL','XRAY','DVN','DLR','DFS','DISCA','DISCK','DG',
 'DLTR','D','DOV','DOW','DPS','DTE','DD','DUK','DNB','ETFC','EMN','ETN','EBAY','ECL','EIX','EW','EA','EMR','ETR','EVHC','EOG',
 'EQT','EFX','EQIX','EQR','ESS','EL','ES','EXC','EXPE','EXPD','ESRX','EXR','XOM','FFIV','FB','FAST','FRT','FDX','FIS','FITB','FSLR',
@@ -30,7 +28,7 @@ stocks = ['MMM','ABT','ABBV','ACN','ATVI','AYI','ADBE','AAP','AES','AET','AMG','
 'SJM','JNJ','JCI','JPM','JNPR','KSU','K','KEY','KMB','KIM','KMI','KLAC','KSS','KHC','KR','LB','LLL','LH','LRCX','LEG','LEN','LUK','LVLT','LLY',
 'LNC','LLTC','LKQ','LMT','L','LOW','LYB','MTB','MAC','M','MNK','MRO','MPC','MAR','MMC','MLM','MAS','MA','MAT','MKC','MCD',
 'MCK','MJN','MDT','MRK','MET','MTD','KORS', 'MCHP','MU','MSFT','MAA','MHK','TAP','MDLZ','MON','MNST','MCO','MS','MSI','MUR','MYL',
-'NDAQ','NOV','NAVI','NTAP','NFLX','NWL','NFX','NEM','NWSA','NWS','NEE','NLSN','NKE','NI',
+'NDAQ','NOV','NAVI','NTAP','NFLX','NWL','NFX','NEM','NWS','NEE','NLSN','NKE','NI',
 'NBL','JWN','NSC','NTRS','NOC',
 'NRG','NUE','NVDA','ORLY','OXY','OMC','OKE','ORCL','PCAR','PH','PDCO','PAYX','PYPL','PNR','PBCT','PEP','PKI','PRGO','PFE','PCG','PM',
 'PSX','PNW','PXD','PNC','RL','PPG','PPL','PX','PCLN','PFG','PG','PGR','PLD','PRU','PEG','PSA','PHM','PVH','QRVO','QCOM','PWR',
@@ -41,37 +39,35 @@ stocks = ['MMM','ABT','ABBV','ACN','ATVI','AYI','ADBE','AAP','AES','AET','AMG','
 'UNM','URBN','VFC','VLO','VAR','VTR','VRSN','VRSK','VZ','VRTX','VIAB','V','VNO','VMC','WMT','WBA','WM','WAT','WEC','WFC','HCN','WDC','WU','WRK',
 'WY','WHR','WFM','WMB','WLTW','WYN','WYNN','XEL','XRX','XLNX','XL''XYL','YHOO','YUM','ZBH','ZION','ZTS']
 
-#i = 1
-#skipped = list()
-#for stock in stocks:
-#    tryAgain = True
-#    while tryAgain == True:
-#        print("Testing stock: " + stock + " (Number " + str(i) + " of " + str(len(stocks)) + ")")
-#        try:    
-#            ts = TimeSeries(key='9SROQY0F727KPEXL', output_format='pandas')
-#            data, meta_data = ts.get_daily_adjusted(symbol=stock, outputsize='full')
-#            data.to_csv('StockData/1_15_18' + stock + '.csv')
-#            #rand = random.randint(1, 20)
-#            #print("sleeping for " + str(rand) + " seconds")
-#            #time.sleep(rand)
-#            tryAgain = False
-#            i = i + 1
-#        except:
-#            print("Error with " + stock + ": " + str(sys.exc_info()[0]))
-#            
-#            if (str(sys.exc_info()[0]) == "<class 'ValueError'>"):
-#                print("Skipping because stock doesn't exist")
-#                skipped.append(stock)
-#                i = i + 1
-#                break
-#            #rand = random.randint(1, 20)
-#            #print("sleeping for " + str(rand) + " seconds")
-#            #time.sleep(rand)
+i = 1
+skipped = list()
+for stock in stocks:
+    tryAgain = True
+    while tryAgain == True:
+        print("Testing stock: " + stock + " (Number " + str(i) + " of " + str(len(stocks)) + ")")
+        try:    
+            ts = TimeSeries(key='9SROQY0F727KPEXL', output_format='pandas')
+            data, meta_data = ts.get_daily_adjusted(symbol=stock, outputsize='compact')
+            try:
+                os.remove('StockData/' + stock + '.csv')
+            except OSError:
+                pass
+            data.to_csv('StockData/' + stock + '.csv')
+            tryAgain = False
+            i = i + 1
+        except:
+            print("Error with " + stock + ": " + str(sys.exc_info()[0]))
+            
+            if (str(sys.exc_info()[0]) == "<class 'ValueError'>"):
+                print("Skipping because stock doesn't exist")
+                skipped.append(stock)
+                i = i + 1
 
 print("Skipped stocks")
 for skip in skipped:
     print(skip + " ")
 
+filename = 'StockDataCurrent.csv'
 try:
     os.remove(filename)
 except OSError:
@@ -80,7 +76,7 @@ first = True
 for stock in stocks:
     
     try:
-        csvfile = open('StockData/1_15_18%s.csv' % stock, 'r')
+        csvfile = open('StockData/%s.csv' % stock, 'r')
     except:
         print('Skipped: ' + stock)
         continue
@@ -88,10 +84,7 @@ for stock in stocks:
     reader = csv.DictReader(csvfile)
 
     all_lines = list(reader)
-    
-    
 
-    
     with open(filename, 'a') as csvfile:
          filewriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -109,15 +102,15 @@ for stock in stocks:
                  date = x[1] + "/" + x[2] + "/" + x[0]
                  dates.append(date)
              filewriter.writerow(dates)
-         sizeDiff = len(dates) - len(all_lines) - 2
+         #sizeDiff = len(dates) - len(all_lines) - 2
          #Write the ClosePrice
          closePrice = []
          closePrice.append(stock)
          closePrice.append('open')
          
-         for d in range(sizeDiff):
-             closePrice.append(" ")
-             
+#         for d in range(sizeDiff):
+#             closePrice.append(" ")
+#             
          for i in range(len(all_lines)):
              Day = int(i)
              closePrice.append(all_lines[Day]['1. open'])
@@ -128,8 +121,8 @@ for stock in stocks:
          openPrice.append(stock)
          openPrice.append('high')
          
-         for d in range(sizeDiff):
-             openPrice.append(" ")
+#         for d in range(sizeDiff):
+#             openPrice.append(" ")
              
          for i in range(len(all_lines)):
              Day = int(i)
@@ -142,8 +135,8 @@ for stock in stocks:
          highPrice.append(stock)
          highPrice.append('low')
          
-         for d in range(sizeDiff):
-             highPrice.append(" ")
+#         for d in range(sizeDiff):
+#             highPrice.append(" ")
              
          for i in range(len(all_lines)):
              Day = int(i)
@@ -156,8 +149,8 @@ for stock in stocks:
          lowPrice.append(stock)
          lowPrice.append('close')
          
-         for d in range(sizeDiff):
-             lowPrice.append(" ")
+#         for d in range(sizeDiff):
+#             lowPrice.append(" ")
              
          for i in range(len(all_lines)):
              Day = int(i)
@@ -169,10 +162,18 @@ for stock in stocks:
          volume.append(stock)
          volume.append('Volume')
          
-         for d in range(sizeDiff):
-             volume.append(" ")
+#         for d in range(sizeDiff):
+#             volume.append(" ")
              
          for i in range(len(all_lines)):
              Day = int(i)
              volume.append(all_lines[Day]['6. volume'])
          filewriter.writerow(volume)
+         
+with open(filename, 'rb+') as f:
+    f.seek(0,2)                 # end of file
+    size=f.tell()               # the size...
+    f.truncate(size-1)
+
+Command = '/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/cmake-build-debug/PortfolioManger'
+os.system(Command)
