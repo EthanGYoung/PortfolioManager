@@ -1,11 +1,33 @@
-Date after: 1172018
-Stock: BBY Amount: 1
-Stock: BLL Amount: 1
-Stock: CHRW Amount: 1
-Stock: DGX Amount: 1
-Stock: HD Amount: 1
-Stock: HP Amount: 1
-Stock: LOW Amount: 1
-Stock: MRO Amount: 1.34264
-Stock: NWL Amount: 4.54528
-Stock: UPS Amount: 1
+Date after: 1262018
+AYI,1
+CHRW,1.03381
+CMI,1
+COL,1
+EFX,1
+FLR,9.75768
+JBHT,1
+KORS,1.46778
+LYB,1
+MRO,28.0922
+PCAR,1.27049
+PHM,2.89687
+SRE,1
+UTX,1
+V,1
+
+No Change for stock CMI
+No Change for stock SRE
+Sell all of ABBV
+No Change for stock FLR
+Buy 0.9999999999999998 of PHM
+No Change for stock JBHT
+No Change for stock UTX
+No Change for stock MRO
+No Change for stock EFX
+No Change for stock LYB
+No Change for stock KORS
+No Change for stock AYI
+No Change for stock CHRW
+Sell 9.0 of V
+No Change for stock COL
+Buy 1.27049 of PCAR

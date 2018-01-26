@@ -133,7 +133,7 @@ double Backtest::userBacktestMain() {
 
     cout << "Starting Date (Default 50 in ):" << endl;
     //cin >> date;
-
+cout << "Here: " << getDateIndx(predictDate) << endl;
     runBacktestStocks();
     calcPrevDayChange();
     calcPercentCorrect();
@@ -287,6 +287,7 @@ int Backtest::getDateIndx(tm *Date) {
 
     vector<tm *>::iterator it;
     for (it = dates->begin(); it != dates->end(); it++) {
+        //cout << "Checking : " << date << " against " << stock->second.convertDate(*it) << endl;
         //Checks for matching date and returns the index to it
         if (stock->second.convertDate(*it) == date) {
             return index;

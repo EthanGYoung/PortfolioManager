@@ -34,8 +34,8 @@ char devMain[] = "Not implemented yet.";
 string backtestPrompt = "Run simulation with algorithm..\na. Regression\nPredict dates over a period of..\na. 10 days\nb. 30 days\nc. 60 days\nStarting at date..\n(Example date 10/27/17)\n";
 
 //Input and output filenames
-string stockFilenameDefault = "/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/StockDataCurrent.csv";
-string investorFilenameDefault = "/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/InvestorData.csv";
+string stockFilenameDefault = "StockDataCurrent.csv";
+string investorFilenameDefault = "InvestorData.csv";
 string fundFilenameDefault = "FundData.csv";
 char fileDelimDefault = ',';
 string defaultFundName = "Portfolio";

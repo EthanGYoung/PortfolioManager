@@ -24,7 +24,7 @@ extern std::string investorFilenameDefault;
 extern std::string fundFilenameDefault;
 int login();
 int investorPrompt();
-int managerPrompt();
+int managerPrompt(bool sim, double budget, double upperPercent, double lowerPercent, int num);
 int developerPrompt();
 int newUserPrompt();
 bool checkLogin(int mode);

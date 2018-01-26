@@ -125,7 +125,7 @@ void DataIO::initializeStocksLocal() {
 
 void DataIO::writeDistributionToFile(tm *Date, double *results, std::map<string, Stock> *sl) {
     ofstream myfile;
-    myfile.open("/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/CurrentPicks.txt");
+    myfile.open("CurrentPicks.txt");
     Stock *test = new Stock("Hey");
     //Write date
     myfile << "Date after: " << test->convertDate(Date) << endl;
@@ -134,8 +134,7 @@ void DataIO::writeDistributionToFile(tm *Date, double *results, std::map<string,
     int h = 1;
     for (stock = sl->begin(); stock != sl->end(); stock++) {
         if (results[h] > 0) {
-            myfile << "Stock: " << stock->second.getName() << " Amount: " << results[h] << endl;
-			cout << "Here" << endl;
+            myfile << stock->second.getName() << "," << results[h] << endl;
         }
         h++;
     }

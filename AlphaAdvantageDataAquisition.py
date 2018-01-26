@@ -10,6 +10,7 @@ from alpha_vantage.timeseries import TimeSeries
 import sys
 import csv
 import os
+from time import sleep
 
 #Got rid of ctxs, NWSA
 stocks = ['MMM','ABT','ABBV','ACN','ATVI','AYI','ADBE','AAP','AES','AET','AMG','AFL','A','APD','AKAM','ALK','ALB',
@@ -26,7 +27,8 @@ stocks = ['MMM','ABT','ABBV','ACN','ATVI','AYI','ADBE','AAP','AES','AET','AMG','
 'HCP','HP','HSIC','HES','HPE','HOLX','HD','HON','HRL',
 'HST','HPQ','HUM','HBAN','IDXX','ITW','ILMN','INCY','IR','INTC','ICE','IBM','IP','IPG','IFF','INTU','ISRG','IVZ','IRM','JBHT','JEC',
 'SJM','JNJ','JCI','JPM','JNPR','KSU','K','KEY','KMB','KIM','KMI','KLAC','KSS','KHC','KR','LB','LLL','LH','LRCX','LEG','LEN','LUK','LVLT','LLY',
-'LNC','LLTC','LKQ','LMT','L','LOW','LYB','MTB','MAC','M','MNK','MRO','MPC','MAR','MMC','MLM','MAS','MA','MAT','MKC','MCD',
+'LNC',
+'LKQ','LMT','L','LOW','LYB','MTB','MAC','M','MNK','MRO','MPC','MAR','MMC','MLM','MAS','MA','MAT','MKC','MCD',
 'MCK','MJN','MDT','MRK','MET','MTD','KORS', 'MCHP','MU','MSFT','MAA','MHK','TAP','MDLZ','MON','MNST','MCO','MS','MSI','MUR','MYL',
 'NDAQ','NOV','NAVI','NTAP','NFLX','NWL','NFX','NEM','NWS','NEE','NLSN','NKE','NI',
 'NBL','JWN','NSC','NTRS','NOC',
@@ -55,17 +57,17 @@ for stock in stocks:
             data.to_csv('StockData/' + stock + '.csv')
             tryAgain = False
             i = i + 1
+        except ValueError as e:
+            print("Error with " + stock + ": " + str(e))
+            tryAgain = False
+            if (str(e) != "Please consider optimizing your API call frequency.\n"):
+                tryAgain = True
         except:
-            print("Error with " + stock + ": " + str(sys.exc_info()[0]))
-            
-            if (str(sys.exc_info()[0]) == "<class 'ValueError'>"):
-                print("Skipping because stock doesn't exist")
-                skipped.append(stock)
-                i = i + 1
+            print ("Error with " + stock + ": " + str(sys.exc_info()[0]))
 
-print("Skipped stocks")
-for skip in skipped:
-    print(skip + " ")
+#print("Skipped stocks")
+#for skip in skipped:
+#    print(skip + " ")
 
 filename = 'StockDataCurrent.csv'
 try:
@@ -81,6 +83,7 @@ for stock in stocks:
         print('Skipped: ' + stock)
         continue
     
+   
     reader = csv.DictReader(csvfile)
 
     all_lines = list(reader)
@@ -142,15 +145,14 @@ for stock in stocks:
              Day = int(i)
              highPrice.append(all_lines[Day]['3. low'])
          filewriter.writerow(highPrice)
-            
+
          
          #Write the LowPrice
          lowPrice = []
          lowPrice.append(stock)
          lowPrice.append('close')
          
-#         for d in range(sizeDiff):
-#             lowPrice.append(" ")
+#         for d in range(sizeDiff): lowPrice.append(" ")
              
          for i in range(len(all_lines)):
              Day = int(i)
@@ -175,5 +177,54 @@ with open(filename, 'rb+') as f:
     size=f.tell()               # the size...
     f.truncate(size-1)
 
-Command = '/Users/ethanyoung/Documents/School/CS\ 302/PortfolioManger/cmake-build-debug/PortfolioManger'
+outFile = "CurrentPicks.txt"
+file = open(outFile, "r")
+prev = {}
+for line in file:
+    line = line.split(",")
+    if len(line) == 1:
+        continue
+    value = line[1]
+    prev[line[0]] = value[:-1]
+    
+print('CDing')
+Command = 'cd /home/pi/Desktop/PortfolioManager/'
 os.system(Command)
+print('Making')
+Command = 'make'
+os.system(Command)
+print('Executing')
+Command = './PortfolioManager'
+os.system(Command)
+print('Sleeping')
+sleep(20)
+
+file = open(outFile, "r")
+curr = {}
+for line in file:
+    line = line.split(",")
+    if len(line) == 1:
+        continue
+    value = line[1]
+    curr[line[0]] = value[:-1]
+
+file = open(outFile, "a+")
+file.write("\n")
+for st in prev:
+    try:
+        print(str(st) + ": " + str(curr[st].strip()) + " - " + str(prev[st].strip()))
+        #Today - yesterday
+        diff = float(curr[st].strip()) - float(prev[st].strip())
+        print("Diff: " + str(diff))
+        if (diff > 0):
+            file.write("Buy " + str(diff) + " of " + st + "\n")
+        elif (diff < 0):
+            file.write("Sell " + str(-1 * diff) + " of " + st + "\n")
+        else: file.write("No Change for stock " + str(st) + "\n")
+    except:
+        print(str(sys.exc_info()[0]))
+        file.write("Buy " + curr[st] + " of " + st + "\n")
+        
+file.close()
+sleep(20)
+os.system('python SendEmail.py')
